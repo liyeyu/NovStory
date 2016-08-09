@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#673AB7</color>
+    <color name="primary_dark">#512DA8</color>
+    <color name="primary_light">#D1C4E9</color>
+    <color name="colorAccent">#00BCD4</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#727272</color>
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#B6B6B6</color>
+
+    <color name="play_divider">#ffd5d5d5</color>
+    <color name="toolbar_color">#7effffff</color>
+    <color name="white">#ffffff</color>
+    <color name="white_alpha_dd">#aac4c4c4</color>
+    <color name="black">#000000</color>
+    <color name="half_transparent">#a0000000</color>
+    <color name="half_transparent1">#33000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="gray_f5">#f5f5f5</color>
+    <color name="blur">#A0E8FD</color>
+</resources>

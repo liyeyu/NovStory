@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_menu_home"
+            android:icon="@drawable/ic_home"
+            android:title="@string/app_home"/>
+
+        <item
+            android:id="@+id/nav_menu_love"
+            android:icon="@drawable/ic_stars"
+            android:title="@string/app_love"/>
+        <item
+            android:id="@+id/nav_menu_about"
+            android:icon="@drawable/ic_about"
+            android:title="@string/app_about"/>
+
+        <item
+            android:id="@+id/nav_menu_setting"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/app_setting"/>
+
+    </group>
+
+</menu>

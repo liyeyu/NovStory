@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:gravity="center"
+              android:layout_width="match_parent"
+              android:background="@color/colorPrimary"
+              android:layout_height="@dimen/home_menu_head">
+
+    <com.liyeyu.novstory.view.RoundedImageView
+        android:id="@+id/iv_header_face"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/my_love"/>
+
+    <TextView
+        android:gravity="center"
+        android:layout_marginTop="@dimen/default_padding"
+        android:id="@+id/tv_home_name"
+        style="@style/MusicItemTitleText"
+        android:textColor="@color/white"
+        android:text="@string/app_name"/>
+
+</LinearLayout>

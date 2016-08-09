@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:background="@color/primary_light"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <TextView
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:id="@+id/tv_splash_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/splash_title"
+        android:layout_marginBottom="@dimen/play_notification_size"
+        android:gravity="center"
+        android:text="@string/app_name"
+        android:textColor="@color/white"/>
+
+    <ImageView
+        android:visibility="gone"
+        android:layout_marginTop="@dimen/play_notification_size_custom"
+        android:layout_centerInParent="true"
+        android:id="@+id/iv_splash"
+        android:layout_below="@+id/tv_splash_title"
+        android:src="@mipmap/logo_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_marginLeft="@dimen/splash_margin"
+        android:layout_marginRight="@dimen/splash_margin"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tv_splash_left"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/splash_title"
+            android:gravity="left"
+            android:padding="@dimen/splash_padding"
+            android:textColor="@color/white"/>
+        <TextView
+            android:id="@+id/tv_splash_right"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/splash_title"
+            android:padding="@dimen/splash_padding"
+            android:gravity="right"
+            android:textColor="@color/white"/>
+    </LinearLayout>
+</RelativeLayout>

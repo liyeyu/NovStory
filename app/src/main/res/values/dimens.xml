@@ -1,0 +1,29 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="actionbar_title">14sp</dimen>
+    <dimen name="splash_title">25sp</dimen>
+    <dimen name="splash_margin">25dp</dimen>
+    <dimen name="splash_padding">5dp</dimen>
+    <dimen name="actionbar_sub_title">12sp</dimen>
+    <dimen name="default_padding">10dp</dimen>
+    <dimen name="music_item_margin">4dp</dimen>
+    <dimen name="music_play_bottom_margin">2dp</dimen>
+    <dimen name="music_play_divider">0.5dp</dimen>
+    <dimen name="music_play_bottom_btn_size">30dp</dimen>
+    <dimen name="music_play_bottom_height">52dp</dimen>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="home_menu_head">220dp</dimen>
+    <dimen name="play_album_size_width">340dp</dimen>
+    <dimen name="play_album_size_height">340dp</dimen>
+    <dimen name="play_pre_size">60dp</dimen>
+    <dimen name="play_mode_size">34dp</dimen>
+    <dimen name="play_mode_love_size">25dp</dimen>
+    <dimen name="play_notification_size_custom">20dp</dimen>
+    <dimen name="play_notification_size">100dp</dimen>
+    <dimen name="play_notification_size_small">60dp</dimen>
+    <dimen name="play_margin_size">80dp</dimen>
+    <dimen name="about_text">16sp</dimen>
+    <dimen name="sp10">10sp</dimen>
+</resources>

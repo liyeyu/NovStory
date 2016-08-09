@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">NovStory</string>
+    <string name="app_home">首页</string>
+    <string name="app_love">喜欢</string>
+    <string name="app_setting">设置</string>
+    <string name="app_about">关于</string>
+    <string name="app_about_our">关于我们</string>
+    <string name="open">open</string>
+    <string name="close">close</string>
+    <string name="search">搜索</string>
+    <string name="share">分享</string>
+
+    <string name="start_anim_icon">icon</string>
+    <string name="start_anim_title">title</string>
+    <string name="start_anim_singer">singer</string>
+    <string name="start_anim_play">play</string>
+
+    <string name="stop_casting">Stop Casting</string>
+    <string name="label_pause">Pause</string>
+    <string name="label_play">Play</string>
+    <string name="label_previous">Previous</string>
+    <string name="label_next">Next</string>
+    <string name="title_settings">设置</string>
+    <string name="name_my">喵了个咪</string>
+    <string name="name_you">小红</string>
+    <string name="splash_left_1">遇见你</string>
+    <string name="splash_right_1">是我最好的幸运</string>
+    <string name="splash_left_2">相信我</string>
+    <string name="splash_right_2">都会好起来的</string>
+    <string name="splash_left_3">在一起</string>
+    <string name="splash_right_3">不多不少，一切刚好</string>
+    <string name="about_text">\u3000\u3000小红，今年七夕，突然想送你一份特别的礼物，每当你看到这里，就会想起我，想起我们的十一月。\n\u3000\u3000其实亲爱的，我一直在你身边，不曾离开过。</string>
+    <string name="about_author">by 喵了个咪</string>
+
+</resources>

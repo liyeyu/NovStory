@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/bg_about"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.liyeyu.novstory.view.AppBarHeadView
+        android:id="@+id/head_about"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <TextView
+        android:padding="@dimen/play_notification_size_custom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/default_padding"
+        android:textSize="@dimen/actionbar_title"
+        android:textColor="@color/white"
+        android:text="@string/about_text"/>
+    <TextView
+        android:paddingRight="@dimen/music_play_bottom_height"
+        android:gravity="right"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/about_text"
+        android:textColor="@color/white"
+        android:text="@string/about_author"/>
+
+
+</LinearLayout>

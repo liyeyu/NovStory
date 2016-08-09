@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fl_play_list_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <com.liyeyu.novstory.view.AppBarHeadView
+            android:id="@+id/head_music_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <ImageView
+            android:id="@+id/iv_list_mask"
+            android:layout_below="@+id/head_music_list"
+            android:scaleType="centerCrop"
+            android:src="@drawable/bg_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <com.liyeyu.novstory.view.MusicPlayView
+            android:id="@+id/mpv_playing"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            >
+        </com.liyeyu.novstory.view.MusicPlayView>
+
+        <android.support.v7.widget.RecyclerView
+            android:background="@drawable/bg_list1"
+            android:layout_above="@+id/mpv_playing"
+            android:layout_below="@+id/head_music_list"
+            android:id="@+id/rv_music_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </android.support.v7.widget.RecyclerView>
+
+    </RelativeLayout>
+
+</FrameLayout>

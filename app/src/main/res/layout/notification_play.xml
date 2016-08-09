@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@color/gray_f5"
+              android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/iv_music_icon"
+        android:layout_width="@dimen/play_notification_size"
+        android:layout_height="@dimen/play_notification_size"
+        android:scaleType="centerCrop"
+        android:src="@drawable/img_default"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:paddingBottom="@dimen/default_padding"
+            android:paddingLeft="@dimen/default_padding"
+            >
+
+            <TextView
+                android:id="@+id/tv_notify_title"
+                style="@style/MusicItemTitleText"
+                android:layout_width="match_parent"
+                android:layout_marginRight="@dimen/default_padding"
+                android:layout_marginTop="@dimen/default_padding"
+                android:layout_toLeftOf="@+id/iv_notify_close"
+                android:text="@string/app_name"/>
+
+            <TextView
+                android:id="@+id/tv_notify_singer"
+                style="@style/MusicItemTitleSinger"
+                android:layout_below="@+id/tv_notify_title"
+                android:layout_marginTop="@dimen/music_item_margin"
+                android:text="@string/app_name"/>
+
+            <ImageView
+                android:padding="@dimen/default_padding"
+                android:id="@+id/iv_notify_close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/play_notify_close"/>
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/music_play_divider"
+            android:background="@color/play_divider"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+
+            <ImageView
+                android:id="@+id/iv_notify_play_pre"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/tv_music_play"
+                android:layout_weight="1"
+                android:padding="@dimen/default_padding"
+                android:src="@drawable/note_btn_pre_white"/>
+
+            <ImageView
+                android:id="@+id/tv_notify_play"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/default_padding"
+                android:layout_marginRight="@dimen/default_padding"
+                android:layout_toLeftOf="@+id/tv_music_play_next"
+                android:layout_weight="1"
+                android:src="@drawable/mv_btn_play_prs"/>
+
+            <ImageView
+                android:id="@+id/tv_notify_play_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/default_padding"
+                android:layout_weight="1"
+                android:padding="@dimen/default_padding"
+                android:src="@drawable/note_btn_next_white"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+</LinearLayout>
