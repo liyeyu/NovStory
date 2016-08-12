@@ -40,18 +40,34 @@ public class SplashActivity extends BaseActivity implements ViewPager.OnPageChan
         mViewPager = (ViewPager) findViewById(R.id.vp_splash);
         mViewPager.setAdapter(new SplashAdapter());
         mViewPager.addOnPageChangeListener(this);
-
+        mViewPager.setPageTransformer(false, new ViewPager.PageTransformer() {
+            @Override
+            public void transformPage(View view, float position) {
+//                int pageWidth = view.getWidth();
+//                if (position < -1) {
+////                    view.setAlpha(0);
+//                } else if (position <= 1) { // [-1,1]
+//                    TextView left = (TextView) view.findViewById(R.id.tv_splash_left);
+//                    TextView right = (TextView) view.findViewById(R.id.tv_splash_right);
+//                    left.setTranslationX((float) (-(1 - position) * 0.5 * pageWidth));
+//                    right.setTranslationX( (-(1 - position) * pageWidth));
+//
+//                } else {
+////                    view.setAlpha(0);
+//                }
+            }
+        });
     }
 
     @Override
     protected void initData() {
 
         Boolean isFirst = AppConfig.get(Constants.FIRST_LAUNCH, true);
-        if(!isFirst){
+        if(isFirst){
             startPlayListActivity();
         }
         mAnimator = ValueAnimator.ofFloat(1, 0.5f);
-        mAnimator.setDuration(1200);
+        mAnimator.setDuration(2000);
         mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {

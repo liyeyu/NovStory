@@ -2,6 +2,7 @@ package com.liyeyu.novstory.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -59,7 +60,7 @@ public class AppBarHeadView extends FrameLayout {
         mSubTitle = (TextView) mAppBarLayout.findViewById(R.id.tv_head_sub_title);
         if(attrs!=null){
             TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.app_bar);
-            int color = a.getColor(R.styleable.app_bar_toolbar_bg, context.getResources().getColor(R.color.colorPrimary));
+            int color = a.getColor(R.styleable.app_bar_toolbar_bg, ContextCompat.getColor(context,R.color.colorPrimary));
             mToolbar.setBackgroundColor(color);
             a.recycle();
         }
