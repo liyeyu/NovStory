@@ -63,7 +63,7 @@ public class SplashActivity extends BaseActivity implements ViewPager.OnPageChan
     protected void initData() {
 
         Boolean isFirst = AppConfig.get(Constants.FIRST_LAUNCH, true);
-        if(isFirst){
+        if(!isFirst){
             startPlayListActivity();
         }
         mAnimator = ValueAnimator.ofFloat(1, 0.5f);

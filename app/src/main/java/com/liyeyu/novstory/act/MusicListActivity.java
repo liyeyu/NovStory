@@ -128,7 +128,7 @@ public class MusicListActivity extends BaseActivity{
 
 
     private void listAnim(final boolean isShowMask){
-        mAnimator = ValueAnimator.ofFloat(1, 0f);
+        mAnimator = ValueAnimator.ofFloat(1, 0.3f);
         mAnimator.setDuration(1000);
         mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -137,7 +137,7 @@ public class MusicListActivity extends BaseActivity{
                 if(isShowMask){
                     mRecyclerView.setAlpha(value);
                 }else{
-                    mRecyclerView.setAlpha(1-value);
+                    mRecyclerView.setAlpha(0.7f+value);
                 }
             }
         });
