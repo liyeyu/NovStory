@@ -28,6 +28,9 @@ import com.liyeyu.novstory.manager.AppConfig;
 import com.liyeyu.novstory.play.callback.MediaControllerCallback;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import liyeyu.support.utils.utils.LogUtil;
@@ -65,13 +68,12 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
     private ProgressUpdateEvent mProgressUpdateEvent;
     private boolean isPlayConfig = false;
     private int mProgress;
+    private Random random = new Random();
+    private List<Integer> randomList = new ArrayList<>();
 
     @Override
     public void onCreate() {
         super.onCreate();
-        LogUtil.i("PlayControlService onCreate");
-//        RefWatcher refWatcher = NovStoryApp.getRefWatcher(this);
-//        refWatcher.watch(this);
         initPlayController();
     }
 
@@ -354,6 +356,8 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
         MediaMetadataCompat curMetadata = mediaController.getMetadata();
         if(audio==null && curMetadata==null){
             return;
+
+
         }
         long id ;
         if(curMetadata!=null && audio!=null){
@@ -363,7 +367,7 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
             }
         }
         if(audio!=null){
-            curMetadata = MediaQueueManager.CreateMetaData(this, audio);
+            curMetadata = MediaQueueManager.CreateMetaData(audio);
         }
         play(curMetadata);
     }
@@ -444,48 +448,80 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
 
     @Override
     public void skipToNext() {
-        mQueueManager.skipQueuePosition(1);
-        publishState(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT);
-        mTransportControls.skipToNext();
-        if(mMediaPlayer!=null){
-            play(getCurrentMetaDate());
-        }
+//        int mode = AppConfig.get(Constants.PLAY_MODE, MediaQueueManager.PLAY_MODE_ORDER);
+//        if(mode==MediaQueueManager.PLAY_MODE_RANDOM){
+//            randomList();
+//        }else{
+            mQueueManager.skipQueuePosition(1);
+            publishState(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT);
+            mTransportControls.skipToNext();
+            if(mMediaPlayer!=null){
+                play(getCurrentMetaDate());
+            }
+//        }
     }
 
     @Override
     public void skipToPrevious() {
-        mQueueManager.skipQueuePosition(-1);
-        publishState(PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS);
-        mTransportControls.skipToPrevious();
-        if(mMediaPlayer!=null){
-            play(getCurrentMetaDate());
-        }
+//        int mode = AppConfig.get(Constants.PLAY_MODE, MediaQueueManager.PLAY_MODE_ORDER);
+//        if(mode==MediaQueueManager.PLAY_MODE_RANDOM){
+//            randomList();
+//        }else {
+            mQueueManager.skipQueuePosition(-1);
+            publishState(PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS);
+            mTransportControls.skipToPrevious();
+            if(mMediaPlayer!=null){
+                play(getCurrentMetaDate());
+            }
+//        }
     }
 
 
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
         if(mediaPlayer!=null){
-            int mode = AppConfig.get(Constants.PLAY_MODE, MediaQueueManager.PLAY_MODE_ORDER);
-            switch (mode){
-                case MediaQueueManager.PLAY_MODE_ORDER:
-                case MediaQueueManager.PLAY_MODE_RANDOM:
-                    skipToNext();
-                    break;
-                case MediaQueueManager.PLAY_MODE_SINGLE_LOOP:
-//                    mediaPlayer.setLooping(true);
-                    stop();
-                    play();
-                    break;
-                case MediaQueueManager.PLAY_MODE_SINGLE:
-                    stop();
-                    mediaPlayer.reset();
-                    break;
-            }
+            updateMode();
         }
     }
 
+    private void updateMode(){
+        int mode = AppConfig.get(Constants.PLAY_MODE, MediaQueueManager.PLAY_MODE_ORDER);
+        switch (mode){
+            case MediaQueueManager.PLAY_MODE_ORDER:
+            case MediaQueueManager.PLAY_MODE_RANDOM:
+                skipToNext();
+                break;
+//                randomList();
+//                break;
+            case MediaQueueManager.PLAY_MODE_SINGLE_LOOP:
+                stop();
+                play();
+                break;
+            case MediaQueueManager.PLAY_MODE_SINGLE:
+                stop();
+                mMediaPlayer.reset();
+                break;
+        }
+    }
 
+    public void randomList(){
+        int currentIndex = mQueueManager.mCurrentIndex;
+        List<MediaSessionCompat.QueueItem> list = mQueueManager.getCurrentPlayQueueItems();
+        if(list.size()==1 || list.size()==0){
+            return;
+        }
+        randomList.clear();
+        for (int i = 0; i < list.size(); i++) {
+            if(i!=currentIndex){
+                randomList.add(i);
+            }
+        }
+        int index = random.nextInt(randomList.size());
+        currentIndex = randomList.get(index);
+        if(currentIndex<list.size()){
+            play(MediaQueueManager.metaDataIds.get(list.get(currentIndex).getQueueId()));
+        }
+    }
     
     public class MediaSessionCallback extends MediaSessionCompat.Callback{
         @Override

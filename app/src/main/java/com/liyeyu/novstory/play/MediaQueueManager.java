@@ -36,7 +36,7 @@ public class MediaQueueManager extends BaseManager{
     public static final String ALL = "all";
     public static final String LOVE = "love";
     public int mCurrentIndex = 0;
-    public static MediaQueueManager queueManager;
+    private static MediaQueueManager queueManager;
     public static List<MediaSessionCompat.QueueItem> LoveQueueItems = new ArrayList<>();
     public static List<MediaSessionCompat.QueueItem> AllQueueItems = new ArrayList<>();
     private volatile static List<MediaSessionCompat.QueueItem> CurrentPlayQueueItems = new ArrayList<>();
@@ -49,17 +49,6 @@ public class MediaQueueManager extends BaseManager{
     private MediaQueueManager() {
         QueueTitles.put(ALL,AllQueueItems);
         QueueTitles.put(LOVE,LoveQueueItems);
-//        Observable.just(ALL).take(1).subscribeOn(Schedulers.io())
-//                .subscribe(new Action1<String>() {
-//                    @Override
-//                    public void call(String tag) {
-//                        queryMediaList(mApp,tag);
-//                        NovPlayController.get().setConfigMetaDate();
-//                        if( NovPlayController.get().getSession()!=null){
-//                            NovPlayController.get().getSession().setQueue(CurrentPlayQueueItems);
-//                        }
-//                    }
-//                });
     }
 
     public static MediaQueueManager get(){
@@ -73,10 +62,14 @@ public class MediaQueueManager extends BaseManager{
         return queueManager;
     }
 
+    public List<MediaSessionCompat.QueueItem> getCurrentPlayQueueItems() {
+        return CurrentPlayQueueItems;
+    }
 
     public int getCurrentIndex() {
         return mCurrentIndex;
     }
+
     public static int nextMode() {
         int mode = AppConfig.get(Constants.PLAY_MODE, MediaQueueManager.PLAY_MODE_ORDER);
         mode = ++mode % MODES.length;
@@ -105,10 +98,10 @@ public class MediaQueueManager extends BaseManager{
             }
             mAudioList.clear();
             mAudioList.addAll(mLoveList);
-            updateQueue(context, mLoveList,LoveQueueItems);
+            updateQueue(mLoveList,LoveQueueItems);
         }else{
             AllQueueItems.clear();
-            updateQueue(context, mAudioList,AllQueueItems);
+            updateQueue(mAudioList,AllQueueItems);
         }
         if( NovPlayController.get().getSession()!=null){
             NovPlayController.get().getSession().setQueue(CurrentPlayQueueItems);
@@ -116,10 +109,10 @@ public class MediaQueueManager extends BaseManager{
         return mAudioList;
     }
 
-    private synchronized void updateQueue(Context context,List<Audio> audios,List<MediaSessionCompat.QueueItem> items){
+    private synchronized void updateQueue(List<Audio> audios,List<MediaSessionCompat.QueueItem> items){
         CurrentPlayQueueItems.clear();
         for (Audio audio:audios) {
-            MediaMetadataCompat compat = CreateMetaData(context, audio);
+            MediaMetadataCompat compat = CreateMetaData(audio);
             MediaSessionCompat.QueueItem queueItem = new MediaSessionCompat.QueueItem(compat.getDescription(),audio.getId());
             items.add(queueItem);
             CurrentPlayQueueItems.add(queueItem);
@@ -179,7 +172,7 @@ public class MediaQueueManager extends BaseManager{
         return mCurrentIndex;
     }
 
-    public static MediaMetadataCompat CreateMetaData(Context context, Audio audio){
+    public static MediaMetadataCompat CreateMetaData(Audio audio){
         return new  MediaMetadataCompat.Builder()
                 .putString(MediaMetadataCompat.METADATA_KEY_ARTIST,audio.getArtist())
                 .putString(MediaMetadataCompat.METADATA_KEY_ALBUM,audio.getAlbum())

@@ -137,8 +137,8 @@ public class MusicPlayView extends FrameLayout implements View.OnClickListener{
             Pair<View, String> pair4 = Pair.create((View)getSinger(), getContext().getString(R.string.start_anim_singer));
             ActivityOptionsCompat optionsCompat
                     = ActivityOptionsCompat.makeSceneTransitionAnimation((Activity) getContext(),pair1,pair2,pair3,pair4);
-            optionsCompat.update( ActivityOptionsCompat.makeScaleUpAnimation(
-                    mIcon, mIcon.getWidth()/2, mIcon.getHeight()/2 , mIcon.getWidth(), mIcon.getHeight() ));
+//            optionsCompat.update( ActivityOptionsCompat.makeScaleUpAnimation(
+//                    mIcon, mIcon.getWidth()/2, mIcon.getHeight()/2 , mIcon.getWidth(), mIcon.getHeight() ));
             ActivityCompat.startActivityForResult((Activity) getContext(), intent, Constants.LOVE_STATE_CHANGE, optionsCompat.toBundle());
         }else{
             IntentUtils.startPlayActivity((Activity) getContext(),null);

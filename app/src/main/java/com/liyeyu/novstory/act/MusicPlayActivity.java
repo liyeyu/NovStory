@@ -44,7 +44,6 @@ import com.sackcentury.shinebuttonlib.ShineButton;
 
 import java.util.List;
 
-import liyeyu.support.utils.utils.LogUtil;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
@@ -155,7 +154,6 @@ public class MusicPlayActivity extends BaseActivity implements
                 setResult(RESULT_OK);
             }
         });
-        LogUtil.i("mAlbumPicView:"+ DisplayUtils.pxToDip(mAlbumPicView.getMeasuredHeight()));
     }
 
 

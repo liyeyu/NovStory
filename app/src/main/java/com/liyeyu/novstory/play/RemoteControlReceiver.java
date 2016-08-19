@@ -23,7 +23,7 @@ public class RemoteControlReceiver extends BroadcastReceiver {
                         ||KeyEvent.KEYCODE_MEDIA_PLAY == event.getKeyCode()) {
                     NovPlayController.get().play();
                 }else if(KeyEvent.KEYCODE_MEDIA_NEXT == event.getKeyCode()){
-                    NovPlayController.get().onSkipToPrevious();
+                    NovPlayController.get().onSkipToNext();
                 }else if(KeyEvent.KEYCODE_MEDIA_PREVIOUS == event.getKeyCode()){
                     NovPlayController.get().onSkipToPrevious();
                 }

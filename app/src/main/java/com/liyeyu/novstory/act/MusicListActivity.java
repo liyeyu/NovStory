@@ -284,14 +284,14 @@ public class MusicListActivity extends BaseActivity{
 
             }
         };
-        PermissionsManager.checkPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE, mPermissionsCallBack);
+        PermissionsManager.get().checkPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE,mPermissionsCallBack);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         //检验权限
-        PermissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults,mPermissionsCallBack);
+        PermissionsManager.get().onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override
