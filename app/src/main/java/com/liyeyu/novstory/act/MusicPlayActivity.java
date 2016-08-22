@@ -130,6 +130,8 @@ public class MusicPlayActivity extends BaseActivity implements
         mPre.setOnClickListener(this);
         mNext.setOnClickListener(this);
         mPlay.setOnClickListener(this);
+        mLrcView.setOnClickListener(this);
+        mAlbumPicView.setOnClickListener(this);
         mAlbumPicView.setFlingListener(this);
         mProgressView = (MusicPlayProgressView) findViewById(R.id.mv_play_bottom_progress);
         mLayoutBottom.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -149,18 +151,6 @@ public class MusicPlayActivity extends BaseActivity implements
                     }
                 }
 
-            }
-        });
-        mLrcView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(view.getVisibility()==View.VISIBLE){
-                    mAlbumPicView.setVisibility(View.VISIBLE);
-                    view.setVisibility(View.GONE);
-                }else{
-                    mAlbumPicView.setVisibility(View.GONE);
-                    view.setVisibility(View.VISIBLE);
-                }
             }
         });
         mProgressView.updateMax(mMetadata, mMediaController.getPlaybackState());
@@ -379,6 +369,16 @@ public class MusicPlayActivity extends BaseActivity implements
                 break;
             case R.id.iv_play_next:
                 RxBus.get().post(new MusicFlingEvent(MusicFlingEvent.FLING_LEFT));
+                break;
+            case R.id.apv_album:
+            case R.id.lrc_all:
+                if(mLrcView.getVisibility()==View.VISIBLE){
+                    mAlbumPicView.setVisibility(View.VISIBLE);
+                    mLrcView.setVisibility(View.GONE);
+                }else{
+                    mAlbumPicView.setVisibility(View.GONE);
+                    mLrcView.setVisibility(View.VISIBLE);
+                }
                 break;
         }
     }
