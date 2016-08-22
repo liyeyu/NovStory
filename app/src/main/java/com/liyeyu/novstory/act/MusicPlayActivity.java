@@ -8,6 +8,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MenuItem;
@@ -33,6 +34,9 @@ import com.liyeyu.novstory.manager.AppConfig;
 import com.liyeyu.novstory.manager.ShareManager;
 import com.liyeyu.novstory.play.MediaQueueManager;
 import com.liyeyu.novstory.play.NovPlayController;
+import com.liyeyu.novstory.play.lrc.DefaultLrcBuilder;
+import com.liyeyu.novstory.play.lrc.LrcRow;
+import com.liyeyu.novstory.play.lrc.LrcView;
 import com.liyeyu.novstory.utils.DisplayUtils;
 import com.liyeyu.novstory.utils.ImageLoader;
 import com.liyeyu.novstory.utils.MediaUtils;
@@ -71,6 +75,8 @@ public class MusicPlayActivity extends BaseActivity implements
     private Subscription mRxProgressUpdate;
     private ImageView mMode;
     private long mMediaId;
+    private LrcView mLrcView;
+    private DefaultLrcBuilder mLrcBuilder;
 
     @Override
     protected int OnCreateView() {
@@ -92,6 +98,9 @@ public class MusicPlayActivity extends BaseActivity implements
                 if (mProgressView != null) {
                     mProgressView.setProgress(progressUpdateEvent.getProgress());
                 }
+                if(mLrcView!=null){
+                    mLrcView.seekLrcToTime(progressUpdateEvent.getProgress());
+                }
             }
         });
         return R.layout.activity_music_play;
@@ -111,6 +120,7 @@ public class MusicPlayActivity extends BaseActivity implements
         mLove = (ShineButton) findViewById(R.id.iv_play_love);
         mAlbumPicView = (AlbumPicView) findViewById(R.id.apv_album);
         mBackground = (ImageView) findViewById(R.id.iv_play_bg);
+        mLrcView = (LrcView) findViewById(R.id.lrc_all);
         mMode = (ImageView) findViewById(R.id.iv_play_mode);
         mPre = (ImageView) findViewById(R.id.iv_play_left);
         mNext = (ImageView) findViewById(R.id.iv_play_next);
@@ -141,6 +151,18 @@ public class MusicPlayActivity extends BaseActivity implements
 
             }
         });
+        mLrcView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(view.getVisibility()==View.VISIBLE){
+                    mAlbumPicView.setVisibility(View.VISIBLE);
+                    view.setVisibility(View.GONE);
+                }else{
+                    mAlbumPicView.setVisibility(View.GONE);
+                    view.setVisibility(View.VISIBLE);
+                }
+            }
+        });
         mProgressView.updateMax(mMetadata, mMediaController.getPlaybackState());
         updateAlbumMediaData();
         updatePlayView(new MusicChangeEvent(MusicChangeEvent.ERROR_POS
@@ -154,8 +176,24 @@ public class MusicPlayActivity extends BaseActivity implements
                 setResult(RESULT_OK);
             }
         });
+        mLrcBuilder = new DefaultLrcBuilder();
+        beginLrcPlay();
     }
 
+    private void beginLrcPlay(){
+        String path = "";
+        if(mAudio!=null){
+            path = mAudio.getPath();
+        }else if(mMetadata!=null){
+            path = mMetadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI);
+        }
+        String lrc = mLrcBuilder.getFromFile(path);
+        if(TextUtils.isEmpty(lrc)){
+            mLrcBuilder.getLrcFromUrl(mTitle,mSinger);
+        }
+        List<LrcRow> rows = mLrcBuilder.getLrcRows(lrc);
+        mLrcView.setLrc(rows);
+    }
 
     private void updatePlayMode() {
         int mode = AppConfig.get(Constants.PLAY_MODE, MediaQueueManager.PLAY_MODE_ORDER);
@@ -319,6 +357,7 @@ public class MusicPlayActivity extends BaseActivity implements
     private void mediaChange() {
         initData();
         updateAlbumMediaData();
+        beginLrcPlay();
         mProgressView.updateMax(mMetadata, mMediaController.getPlaybackState());
         mHeadView.setTitle(mTitle);
         mHeadView.setSubTitle(mSinger);

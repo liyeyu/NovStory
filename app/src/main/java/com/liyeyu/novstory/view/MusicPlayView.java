@@ -20,6 +20,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding.view.RxView;
 import com.liyeyu.novstory.Constants;
 import com.liyeyu.novstory.R;
 import com.liyeyu.novstory.act.MusicPlayActivity;
@@ -27,7 +28,10 @@ import com.liyeyu.novstory.play.NovPlayController;
 import com.liyeyu.novstory.utils.ImageLoader;
 import com.liyeyu.novstory.utils.IntentUtils;
 
+import java.util.concurrent.TimeUnit;
+
 import liyeyu.support.utils.utils.LogUtil;
+import rx.functions.Action1;
 
 /** Music Play bottom view
  * Created by Liyeyu on 2016/7/18.
@@ -64,10 +68,15 @@ public class MusicPlayView extends FrameLayout implements View.OnClickListener{
         mNext = (ImageView) view.findViewById(R.id.tv_music_play_next);
         mOptions = (ImageView) view.findViewById(R.id.iv_music_play_options);
         mProgress = (ProgressBar) view.findViewById(R.id.pb_music_progress);
-        mLayout.setOnClickListener(this);
         mNext.setOnClickListener(this);
         mPlay.setOnClickListener(this);
         mOptions.setOnClickListener(this);
+        RxView.clicks(mLayout).throttleFirst(1, TimeUnit.SECONDS).subscribe(new Action1<Void>() {
+            @Override
+            public void call(Void aVoid) {
+                startMusicActivity(new Intent(getContext(), MusicPlayActivity.class));
+            }
+        });
     }
 
     public void setTitle(String title){
@@ -114,9 +123,6 @@ public class MusicPlayView extends FrameLayout implements View.OnClickListener{
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.rl_music_play_bottom:
-                startMusicActivity(new Intent(getContext(), MusicPlayActivity.class));
-                break;
             case R.id.tv_music_play:
                 NovPlayController.get().play();
                 break;

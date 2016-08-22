@@ -17,6 +17,9 @@ public class Constants {
     public static final String LAST_PROGRESS = "last_progress";
     public static final String SETTING_DURATION = "setting_duration";
     public static final int LOVE_STATE_CHANGE = 100;
+
+    public static final String LRC_URL = "http://geci.me/api/lyric/";
+
     /**
      * 文件存储目录
      */
