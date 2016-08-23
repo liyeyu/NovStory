@@ -31,5 +31,6 @@
     <string name="splash_right_3">不多不少，一切刚好</string>
     <string name="about_text">\u3000\u3000小红，今年七夕，突然想送你一份特别的礼物，每当你看到这里，就会想起我，想起我们的十一月。\n\u3000\u3000其实亲爱的，我一直在你身边，不曾离开过。</string>
     <string name="about_author">by 喵了个咪</string>
-
+    <string name="lrc_not">没有找到歌词,快去下载吧</string>
+    <string name="lrc_loading">正在下载歌词...</string>
 </resources>

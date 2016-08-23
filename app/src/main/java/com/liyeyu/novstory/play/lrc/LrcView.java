@@ -70,15 +70,15 @@ public class LrcView extends View implements ILrcView {
     /**
      * 拖动歌词时，展示当前高亮歌词的时间的字体大小默认值
      **/
-    private int mSeekLineTextSize = 15;
+    private int mSeekLineTextSize = 30;
     /**
      * 拖动歌词时，展示当前高亮歌词的时间的字体大小最小值
      **/
-    private int mMinSeekLineTextSize = 13;
+    private int mMinSeekLineTextSize = 25;
     /**
      * 拖动歌词时，展示当前高亮歌词的时间的字体大小最大值
      **/
-    private int mMaxSeekLineTextSize = 18;
+    private int mMaxSeekLineTextSize = 30;
 
     /**
      * 歌词字体大小默认值
@@ -110,26 +110,28 @@ public class LrcView extends View implements ILrcView {
     /**
      * 当没有歌词的时候展示的内容
      **/
-    private String mLoadingLrcTip = "没有歌词,点击重试";
+    private String mLoadingLrcTip;
 
     private Paint mPaint;
-    private boolean hasLrc = true;
 
     public LrcView(Context context, AttributeSet attr) {
         super(context, attr);
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaint.setTextSize(mLrcFontSize);
     }
-
     public void setListener(ILrcViewListener l) {
         mLrcViewListener = l;
     }
 
     public void setLoadingTipText(String text) {
         mLoadingLrcTip = text;
+        invalidate();
     }
     public boolean isHasLrc() {
-        return hasLrc;
+        return mLrcRows != null && mLrcRows.size() != 0;
+    }
+    public int oneLineHeight() {
+        return mLrcFontSize+mPaddingY;
     }
     @Override
     protected void onDraw(Canvas canvas) {
@@ -137,7 +139,6 @@ public class LrcView extends View implements ILrcView {
         final int width = getWidth(); // width of this view
         //当没有歌词的时候
         if (mLrcRows == null || mLrcRows.size() == 0) {
-            hasLrc = false;
             if (mLoadingLrcTip != null) {
                 // draw tip when no lrc.
                 mPaint.setColor(mHeightLightRowColor);
@@ -158,6 +159,9 @@ public class LrcView extends View implements ILrcView {
          *	第2步：画出正在播放的那句歌词的上面可以展示出来的歌词
          *	第3步：画出正在播放的那句歌词的下面的可以展示出来的歌词
          */
+        if(mHignlightRow>=mLrcRows.size()){
+            return;
+        }
         // 1、 高亮地画出正在要高亮的的那句歌词
         String highlightText = mLrcRows.get(mHignlightRow).content;
         int highlightRowY = height / 2 - mLrcFontSize;
@@ -255,9 +259,13 @@ public class LrcView extends View implements ILrcView {
      */
     private boolean mIsFirstMove = false;
 
+    public void setIsCanDrag(boolean mIsCanDrag) {
+        this.mIsCanDrag = mIsCanDrag;
+    }
+    private boolean mIsCanDrag = true;
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (mLrcRows == null || mLrcRows.size() == 0) {
+        if (mLrcRows == null || mLrcRows.size() == 0 || !mIsCanDrag) {
             return super.onTouchEvent(event);
         }
         switch (event.getAction()) {

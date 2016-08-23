@@ -67,7 +67,7 @@ public class DefaultLrcBuilder implements ILrcBuilder {
                 Collections.sort(rows);
                 if(rows!=null&&rows.size()>0){
                     for(LrcRow lrcRow:rows){
-                        Log.d(TAG, "lrcRow:" + lrcRow.toString());
+//                        Log.d(TAG, "lrcRow:" + lrcRow.toString());
                     }
                 }
             }
@@ -119,7 +119,7 @@ public class DefaultLrcBuilder implements ILrcBuilder {
         return "";
     }
 
-    public void getLrcFromUrl(final String songName, final String artist){
+    public void getLrcFromUrl(final String songName, final String artist,final OnLrcLoadListener listener){
         RetrofitHelper.request(BaseApi.class, new RetrofitHelper.HttpCallBack<SongBDRes, BaseApi>() {
             @Override
             public Call<SongBDRes> request(BaseApi request) {
@@ -133,41 +133,69 @@ public class DefaultLrcBuilder implements ILrcBuilder {
                     List<SongBDRes.SongBean> song = lrcRes.getSong();
                     if(song!=null && !song.isEmpty()){
                         SongBDRes.SongBean songBean = song.get(0);
-                        getLrcFromBD(songBean.getSongid());
+                        for (SongBDRes.SongBean item:song) {
+                            if(item.getArtistname().equals(artist)){
+                                songBean = item;
+                            }
+                        }
+                        getLrcFromBD(songBean.getSongid(),listener);
+                    }else{
+                        if(listener!=null){
+                            listener.onError();
+                        }
+                    }
+                }else{
+                    if(listener!=null){
+                        listener.onError();
                     }
                 }
             }
 
             @Override
             public void onError(String message) {
-
+                if(listener!=null){
+                    listener.onError();
+                }
             }
         });
     }
 
-    private void getLrcFromBD(final String songid){
+    private void getLrcFromBD(final String songId,final OnLrcLoadListener listener){
         RetrofitHelper.request(BaseApi.class, new RetrofitHelper.HttpCallBack<LrcBDRes, BaseApi>() {
             @Override
             public Call<LrcBDRes> request(BaseApi request) {
-                return request.getBDLrc(Constants.LRC_URL_BAIDU_METHOD,songid);
+                return request.getBDLrc(Constants.LRC_URL_BAIDU_METHOD,songId);
             }
 
             @Override
             public void onCompleted(LrcBDRes lrcRes) {
                 if(lrcRes!=null && !TextUtils.isEmpty(lrcRes.getLrcContent())){
                     CommUtils.writeFile(curLrcPath,lrcRes.getLrcContent());
+                    if(listener!=null){
+                        listener.onSuccess();
+                    }
+                }else{
+                    if(listener!=null){
+                        listener.onError();
+                    }
                 }
             }
 
             @Override
             public void onError(String message) {
-
+                if(listener!=null){
+                    listener.onError();
+                }
             }
         });
     }
 
-
     public String getCurLrcPath() {
         return curLrcPath;
+    }
+
+    public interface OnLrcLoadListener{
+       void  onSuccess();
+        void  onError();
     }
 }

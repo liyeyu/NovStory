@@ -131,7 +131,6 @@ public class MusicPlayActivity extends BaseActivity implements
         mNext.setOnClickListener(this);
         mPlay.setOnClickListener(this);
         mLrcView.setOnClickListener(this);
-        mAlbumPicView.setOnClickListener(this);
         mAlbumPicView.setFlingListener(this);
         mProgressView = (MusicPlayProgressView) findViewById(R.id.mv_play_bottom_progress);
         mLayoutBottom.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -166,6 +165,12 @@ public class MusicPlayActivity extends BaseActivity implements
                 setResult(RESULT_OK);
             }
         });
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mLrcView.getLayoutParams();
+        params.height = mLrcView.oneLineHeight();
+        mLrcView.setLayoutParams(params);
+        mLrcView.setIsCanDrag(false);
+        mLrcView.setHeightLightRowColor(ContextCompat.getColor(this,R.color.white));
+        mLrcView.setNormalRowColor(ContextCompat.getColor(this,R.color.toolbar_color));
         mLrcBuilder = new DefaultLrcBuilder();
         beginLrcPlay();
     }
@@ -179,7 +184,18 @@ public class MusicPlayActivity extends BaseActivity implements
         }
         String lrc = mLrcBuilder.getFromFile(path);
         if(TextUtils.isEmpty(lrc)){
-            mLrcBuilder.getLrcFromUrl(mTitle,mSinger);
+            mLrcBuilder.getLrcFromUrl(mTitle,mSinger,new DefaultLrcBuilder.OnLrcLoadListener(){
+
+                @Override
+                public void onSuccess() {
+                    mLrcView.setLrc(mLrcBuilder.getLrcRows(
+                            mLrcBuilder.getFromFile(mLrcBuilder.getCurLrcPath())));
+                }
+
+                @Override
+                public void onError() {
+                }
+            });
         }
         List<LrcRow> rows = mLrcBuilder.getLrcRows(lrc);
         mLrcView.setLrc(rows);
@@ -362,23 +378,39 @@ public class MusicPlayActivity extends BaseActivity implements
                 updatePlayMode();
                 break;
             case R.id.iv_play_left:
-                RxBus.get().post(new MusicFlingEvent(MusicFlingEvent.FLING_RIGHT));
+                if(mAlbumPicView.getVisibility()==View.VISIBLE){
+                    RxBus.get().post(new MusicFlingEvent(MusicFlingEvent.FLING_RIGHT));
+                }else{
+                    NovPlayController.get().onSkipToPrevious();
+                }
                 break;
             case R.id.iv_play_play:
                 NovPlayController.get().play();
                 break;
             case R.id.iv_play_next:
-                RxBus.get().post(new MusicFlingEvent(MusicFlingEvent.FLING_LEFT));
-                break;
-            case R.id.apv_album:
-            case R.id.lrc_all:
-                if(mLrcView.getVisibility()==View.VISIBLE){
-                    mAlbumPicView.setVisibility(View.VISIBLE);
-                    mLrcView.setVisibility(View.GONE);
+                if(mAlbumPicView.getVisibility()==View.VISIBLE){
+                    RxBus.get().post(new MusicFlingEvent(MusicFlingEvent.FLING_LEFT));
                 }else{
-                    mAlbumPicView.setVisibility(View.GONE);
-                    mLrcView.setVisibility(View.VISIBLE);
+                    NovPlayController.get().onSkipToNext();
                 }
+                break;
+            case R.id.lrc_all:
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mLrcView.getLayoutParams();
+                if(mAlbumPicView.getVisibility()==View.VISIBLE){
+                    mAlbumPicView.setVisibility(View.GONE);
+                    params.height = RelativeLayout.LayoutParams.MATCH_PARENT;
+                    if(mLrcView.isHasLrc()){
+                        mLrcView.setLoadingTipText(getString(R.string.lrc_loading));
+                    }else{
+                        mLrcView.setLoadingTipText(getString(R.string.lrc_not));
+                    }
+                }else{
+                    mAlbumPicView.setVisibility(View.VISIBLE);
+                    params.height = mLrcView.oneLineHeight();
+                    mLrcView.setLoadingTipText("");
+                }
+                mLrcView.setLayoutParams(params);
+                mLrcView.invalidate();
                 break;
         }
     }

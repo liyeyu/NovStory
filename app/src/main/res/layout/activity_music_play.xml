@@ -32,7 +32,7 @@
             app:toolbar_bg="@color/transparent"
             />
 
-        <FrameLayout
+        <RelativeLayout
             android:layout_above="@+id/ll_play_bottom"
             android:layout_below="@+id/head_music_play"
             android:layout_width="match_parent"
@@ -40,17 +40,19 @@
 
             <com.liyeyu.novstory.view.AlbumPicView
                 android:id="@+id/apv_album"
-                android:layout_gravity="center|top"
+                android:layout_centerHorizontal="true"
                 android:layout_width="@dimen/play_album_size_height"
                 android:layout_height="@dimen/play_album_size_height"
                 android:transitionName="@string/start_anim_icon"
                 />
             <com.liyeyu.novstory.play.lrc.LrcView
-                android:visibility="gone"
+                android:layout_below="@id/apv_album"
+                android:layout_alignParentBottom="true"
                 android:id="@+id/lrc_all"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-        </FrameLayout>
+                android:layout_height="wrap_content"/>
+
+        </RelativeLayout>
 
 
         <LinearLayout
