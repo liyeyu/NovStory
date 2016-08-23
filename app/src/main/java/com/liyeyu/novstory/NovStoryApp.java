@@ -7,7 +7,6 @@ import com.liyeyu.novstory.manager.base.BaseManager;
 import com.liyeyu.novstory.play.PlayControlService;
 import com.liyeyu.novstory.utils.CrashHandler;
 import com.liyeyu.novstory.utils.ImageLoader;
-import com.liyeyu.rxhttp.RetrofitHelper;
 import com.liyeyu.rxhttp.RxHttpConfig;
 
 import liyeyu.support.utils.SupportUtilsConfig;
@@ -27,8 +26,7 @@ public class NovStoryApp extends Application{
 //        refWatcher.watch(this);
         CrashHandler.init(this);
         SupportUtilsConfig.init(this);
-        RxHttpConfig.init(getApplicationContext());
-        RetrofitHelper.BASE_URL = Constants.LRC_URL;
+        RxHttpConfig.init(getApplicationContext(),Constants.BASE_URL);
     }
 
     public void startPlayService () {

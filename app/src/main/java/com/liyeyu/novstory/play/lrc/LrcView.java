@@ -96,7 +96,7 @@ public class LrcView extends View implements ILrcView {
     /**
      * 两行歌词之间的间距
      **/
-    private int mPaddingY = 20;
+    private int mPaddingY = 40;
     /**
      * 拖动歌词时，在当前高亮歌词下面的一条直线的起始位置
      **/

@@ -19,6 +19,11 @@ public class Constants {
     public static final int LOVE_STATE_CHANGE = 100;
 
     public static final String LRC_URL = "http://geci.me/api/lyric/";
+    public static final String LRC_URL_BAIDU = "http://tingapi.ting.baidu.com/v1/restserver/";
+    public static final String SONG_URL_BAIDU_METHOD = "baidu.ting.search.catalogSug";
+    public static final String LRC_URL_BAIDU_METHOD = "baidu.ting.song.lry";
+    public static final String BASE_URL = LRC_URL_BAIDU;
+    public static final String APIKEY_BAIDU = "7fb1aea1948021894cc76bf3c160f6e6";
 
     /**
      * 文件存储目录

@@ -31,7 +31,7 @@ dependencies {
     compile 'com.wang.avi:library:1.0.5'
     compile 'com.sackcentury:shinebutton:0.1.3'
     compile 'com.liyeyu:supportutils:1.0.3'
-    compile 'com.liyeyu:rxhttp:1.0.2'
+    compile 'com.liyeyu:rxhttp:1.0.5'
     compile 'com.android.support:support-v4:24.0.0-alpha2'
 }
 //    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'

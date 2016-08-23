@@ -3,8 +3,11 @@ package com.liyeyu.novstory.play.lrc;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.liyeyu.novstory.Constants;
 import com.liyeyu.novstory.api.BaseApi;
-import com.liyeyu.novstory.entry.LrcRes;
+import com.liyeyu.novstory.entry.LrcBDRes;
+import com.liyeyu.novstory.entry.SongBDRes;
+import com.liyeyu.novstory.utils.CommUtils;
 import com.liyeyu.rxhttp.RetrofitHelper;
 
 import java.io.BufferedReader;
@@ -17,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import liyeyu.support.utils.utils.LogUtil;
 import retrofit2.Call;
 
 /**
@@ -96,14 +98,11 @@ public class DefaultLrcBuilder implements ILrcBuilder {
             }else if( musicFileName.endsWith(".wma")){
                 endWith = ".wma";
             }
-            File file = new File(musicFileName.replace(endWith, ".txt"));
-            if(!file.exists()){
-                file = new File(musicFileName.replace(endWith, ".lrc"));
-                if(!file.exists()){
-                    return "";
-                }
-            }
+            File file = new File(musicFileName.replace(endWith, ".lrc"));
             curLrcPath = file.getPath();
+            if(!file.exists()){
+                return "";
+            }
             InputStreamReader inputReader = new InputStreamReader(new FileInputStream(file));
             BufferedReader bufReader = new BufferedReader(inputReader);
             String line;
@@ -120,16 +119,23 @@ public class DefaultLrcBuilder implements ILrcBuilder {
         return "";
     }
 
-    public void getLrcFromUrl(final String songName,final String artist){
-        RetrofitHelper.request(BaseApi.class, new RetrofitHelper.HttpCallBack<LrcRes, BaseApi>() {
+    public void getLrcFromUrl(final String songName, final String artist){
+        RetrofitHelper.request(BaseApi.class, new RetrofitHelper.HttpCallBack<SongBDRes, BaseApi>() {
             @Override
-            public Call<LrcRes> request(BaseApi request) {
-                return request.get(songName+"/"+artist);
+            public Call<SongBDRes> request(BaseApi request) {
+                String url = songName;
+                return request.getBDSong(Constants.SONG_URL_BAIDU_METHOD,url);
             }
 
             @Override
-            public void onCompleted(LrcRes lrcRes) {
-                LogUtil.i(lrcRes.getCode()+"");
+            public void onCompleted(SongBDRes lrcRes) {
+                if(lrcRes!=null){
+                    List<SongBDRes.SongBean> song = lrcRes.getSong();
+                    if(song!=null && !song.isEmpty()){
+                        SongBDRes.SongBean songBean = song.get(0);
+                        getLrcFromBD(songBean.getSongid());
+                    }
+                }
             }
 
             @Override
@@ -138,6 +144,28 @@ public class DefaultLrcBuilder implements ILrcBuilder {
             }
         });
     }
+
+    private void getLrcFromBD(final String songid){
+        RetrofitHelper.request(BaseApi.class, new RetrofitHelper.HttpCallBack<LrcBDRes, BaseApi>() {
+            @Override
+            public Call<LrcBDRes> request(BaseApi request) {
+                return request.getBDLrc(Constants.LRC_URL_BAIDU_METHOD,songid);
+            }
+
+            @Override
+            public void onCompleted(LrcBDRes lrcRes) {
+                if(lrcRes!=null && !TextUtils.isEmpty(lrcRes.getLrcContent())){
+                    CommUtils.writeFile(curLrcPath,lrcRes.getLrcContent());
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+
+            }
+        });
+    }
+
 
     public String getCurLrcPath() {
         return curLrcPath;
