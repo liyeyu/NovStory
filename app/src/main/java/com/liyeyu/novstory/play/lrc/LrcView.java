@@ -131,7 +131,7 @@ public class LrcView extends View implements ILrcView {
         return mLrcRows != null && mLrcRows.size() != 0;
     }
     public int oneLineHeight() {
-        return mLrcFontSize+mPaddingY;
+        return mLrcFontSize;
     }
     @Override
     protected void onDraw(Canvas canvas) {
@@ -168,6 +168,7 @@ public class LrcView extends View implements ILrcView {
         mPaint.setColor(mHeightLightRowColor);
         mPaint.setTextSize(mLrcFontSize);
         mPaint.setTextAlign(Align.CENTER);
+
         canvas.drawText(highlightText, rowX, highlightRowY, mPaint);
 
         // 上下拖动歌词的时候 画出拖动要高亮的那句歌词的时间 和 高亮的那句歌词下面的一条直线

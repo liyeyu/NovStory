@@ -39,6 +39,10 @@ public class FlipperGestureListener implements GestureDetector.OnGestureListener
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float v, float v1) {
 
+        if(e1==null||e2==null){
+            return false;
+        }
+
         if(e2.getX()-e1.getX()>100){
             RxBus.get().post(new MusicFlingEvent(MusicFlingEvent.FLING_RIGHT));
             return true;

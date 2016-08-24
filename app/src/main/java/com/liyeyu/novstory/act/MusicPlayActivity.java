@@ -77,6 +77,7 @@ public class MusicPlayActivity extends BaseActivity implements
     private long mMediaId;
     private LrcView mLrcView;
     private DefaultLrcBuilder mLrcBuilder;
+    private View mLrcViewMask;
 
     @Override
     protected int OnCreateView() {
@@ -121,6 +122,7 @@ public class MusicPlayActivity extends BaseActivity implements
         mAlbumPicView = (AlbumPicView) findViewById(R.id.apv_album);
         mBackground = (ImageView) findViewById(R.id.iv_play_bg);
         mLrcView = (LrcView) findViewById(R.id.lrc_all);
+        mLrcViewMask =  findViewById(R.id.lrc_all_mask);
         mMode = (ImageView) findViewById(R.id.iv_play_mode);
         mPre = (ImageView) findViewById(R.id.iv_play_left);
         mNext = (ImageView) findViewById(R.id.iv_play_next);
@@ -131,6 +133,7 @@ public class MusicPlayActivity extends BaseActivity implements
         mNext.setOnClickListener(this);
         mPlay.setOnClickListener(this);
         mLrcView.setOnClickListener(this);
+        mLrcViewMask.setOnClickListener(this);
         mAlbumPicView.setFlingListener(this);
         mProgressView = (MusicPlayProgressView) findViewById(R.id.mv_play_bottom_progress);
         mLayoutBottom.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -165,9 +168,6 @@ public class MusicPlayActivity extends BaseActivity implements
                 setResult(RESULT_OK);
             }
         });
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mLrcView.getLayoutParams();
-        params.height = mLrcView.oneLineHeight();
-        mLrcView.setLayoutParams(params);
         mLrcView.setIsCanDrag(false);
         mLrcView.setHeightLightRowColor(ContextCompat.getColor(this,R.color.white));
         mLrcView.setNormalRowColor(ContextCompat.getColor(this,R.color.toolbar_color));
@@ -177,10 +177,10 @@ public class MusicPlayActivity extends BaseActivity implements
 
     private void beginLrcPlay(){
         String path = "";
-        if(mAudio!=null){
-            path = mAudio.getPath();
-        }else if(mMetadata!=null){
+        if(mMetadata!=null){
             path = mMetadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI);
+        }else if(mAudio!=null){
+            path = mAudio.getPath();
         }
         String lrc = mLrcBuilder.getFromFile(path);
         if(TextUtils.isEmpty(lrc)){
@@ -194,6 +194,7 @@ public class MusicPlayActivity extends BaseActivity implements
 
                 @Override
                 public void onError() {
+                    mLrcView.setLoadingTipText(getString(R.string.lrc_not));
                 }
             });
         }
@@ -395,22 +396,22 @@ public class MusicPlayActivity extends BaseActivity implements
                 }
                 break;
             case R.id.lrc_all:
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mLrcView.getLayoutParams();
+            case R.id.lrc_all_mask:
                 if(mAlbumPicView.getVisibility()==View.VISIBLE){
                     mAlbumPicView.setVisibility(View.GONE);
-                    params.height = RelativeLayout.LayoutParams.MATCH_PARENT;
+                    mLrcViewMask.setVisibility(View.GONE);
+                    mLrcView.setVisibility(View.VISIBLE);
                     if(mLrcView.isHasLrc()){
                         mLrcView.setLoadingTipText(getString(R.string.lrc_loading));
                     }else{
                         mLrcView.setLoadingTipText(getString(R.string.lrc_not));
                     }
                 }else{
+                    mLrcView.setVisibility(View.GONE);
                     mAlbumPicView.setVisibility(View.VISIBLE);
-                    params.height = mLrcView.oneLineHeight();
+                    mLrcViewMask.setVisibility(View.VISIBLE);
                     mLrcView.setLoadingTipText("");
                 }
-                mLrcView.setLayoutParams(params);
-                mLrcView.invalidate();
                 break;
         }
     }

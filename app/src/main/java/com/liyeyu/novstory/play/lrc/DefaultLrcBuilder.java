@@ -103,6 +103,12 @@ public class DefaultLrcBuilder implements ILrcBuilder {
             if(!file.exists()){
                 return "";
             }
+            file = new File(musicFileName.replace(endWith, ".txt"));
+            curLrcPath = file.getPath();
+            if(!file.exists()){
+                return "";
+            }
+
             InputStreamReader inputReader = new InputStreamReader(new FileInputStream(file));
             BufferedReader bufReader = new BufferedReader(inputReader);
             String line;
