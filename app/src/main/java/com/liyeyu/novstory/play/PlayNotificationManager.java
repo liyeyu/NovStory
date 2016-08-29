@@ -89,8 +89,7 @@ public class PlayNotificationManager extends BroadcastReceiver implements Action
         //兼容 6.0通知栏样式
         PendingIntent contentIntent = PendingIntent.getActivity(mService, 0,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.setOngoing(mPlaybackState == PlaybackStateCompat.STATE_PLAYING)
-                .setContentIntent(contentIntent);
+        mBuilder.setContentIntent(contentIntent);
 
         String mTitle = mMetadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE);
         String mSinger = mMetadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST);
@@ -147,6 +146,12 @@ public class PlayNotificationManager extends BroadcastReceiver implements Action
             mBuilder.setSmallIcon(R.mipmap.logo_notification);
         }
         Notification mNotification = mBuilder.build();
+        if(Build.VERSION.SDK_INT<Build.VERSION_CODES.LOLLIPOP){
+            mBuilder.setContent(bigViews);
+            mNotification.contentView = bigViews;
+        }else{
+            mBuilder.setOngoing(mPlaybackState == PlaybackStateCompat.STATE_PLAYING);
+        }
 //        boolean isVoice = true, isVibrate = true;
 //        if (isVoice) {
 //            mNotification.defaults |= Notification.DEFAULT_SOUND;

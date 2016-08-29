@@ -83,20 +83,20 @@ public class LrcView extends View implements ILrcView {
     /**
      * 歌词字体大小默认值
      **/
-    private int mLrcFontSize = 50;    // font size of lrc
+    private int mLrcFontSize = 35;    // font size of lrc
     /**
      * 歌词字体大小最小值
      **/
-    private int mMinLrcFontSize = 35;
+    private int mMinLrcFontSize = 25;
     /**
      * 歌词字体大小最大值
      **/
-    private int mMaxLrcFontSize = 50;
+    private int mMaxLrcFontSize = 35;
 
     /**
      * 两行歌词之间的间距
      **/
-    private int mPaddingY = 40;
+    private int mPaddingY = 20;
     /**
      * 拖动歌词时，在当前高亮歌词下面的一条直线的起始位置
      **/

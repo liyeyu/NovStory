@@ -168,6 +168,8 @@ public class MusicPlayActivity extends BaseActivity implements
                 setResult(RESULT_OK);
             }
         });
+        int size = getResources().getDimensionPixelSize(R.dimen.actionbar_title);
+        mLrcView.setLrcFontSize(size);
         mLrcView.setIsCanDrag(false);
         mLrcView.setHeightLightRowColor(ContextCompat.getColor(this,R.color.white));
         mLrcView.setNormalRowColor(ContextCompat.getColor(this,R.color.toolbar_color));
@@ -183,8 +185,10 @@ public class MusicPlayActivity extends BaseActivity implements
             path = mAudio.getPath();
         }
         String lrc = mLrcBuilder.getFromFile(path);
-        if(TextUtils.isEmpty(lrc)){
-            mLrcBuilder.getLrcFromUrl(mTitle,mSinger,new DefaultLrcBuilder.OnLrcLoadListener(){
+        List<LrcRow> rows = mLrcBuilder.getLrcRows(lrc);
+        mLrcView.setLrc(rows);
+        if(TextUtils.isEmpty(lrc) || !mLrcView.isHasLrc()){
+            mLrcBuilder.getLrcFromUrl(mLrcBuilder.getCurLrcPath(),mTitle,mSinger,new DefaultLrcBuilder.OnLrcLoadListener(){
 
                 @Override
                 public void onSuccess() {
@@ -198,8 +202,6 @@ public class MusicPlayActivity extends BaseActivity implements
                 }
             });
         }
-        List<LrcRow> rows = mLrcBuilder.getLrcRows(lrc);
-        mLrcView.setLrc(rows);
     }
 
     private void updatePlayMode() {
@@ -238,16 +240,15 @@ public class MusicPlayActivity extends BaseActivity implements
     private void updateAlbum(MediaMetadataCompat compat, Audio audio, int pos) {
         if (compat != null) {
             updateAlbumPlayView(Long.parseLong(compat.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID))
-                    , compat.getLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER)
-                    , compat.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI), pos);
+                    , compat.getLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER), pos);
         } else if (audio != null) {
-            updateAlbumPlayView(audio.getId(), audio.getAlbumId(), audio.getPath(), pos);
+            updateAlbumPlayView(audio.getId(), audio.getAlbumId(), pos);
         } else {
             mAlbumPicView.getCurrentImageView().setImageResource(ImageLoader.DEF_BG);
         }
     }
 
-    private void updateAlbumPlayView(long songId, long albumId, String path, int pos) {
+    private void updateAlbumPlayView(long songId, long albumId, int pos) {
         mAlbumPicView.setImage(pos,songId,albumId);
         ImageLoader.get().blur(mBackground, MediaUtils.getArtworkUri(this, songId, albumId));
     }

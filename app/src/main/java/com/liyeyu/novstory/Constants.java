@@ -19,6 +19,7 @@ public class Constants {
     public static final int LOVE_STATE_CHANGE = 100;
 
     public static final String LRC_URL = "http://geci.me/api/lyric/";
+    public static final String LRC_URL_KUGOU = "http://apis.baidu.com/geekery/music/";
     public static final String LRC_URL_BAIDU = "http://tingapi.ting.baidu.com/v1/restserver/";
     public static final String SONG_URL_BAIDU_METHOD = "baidu.ting.search.catalogSug";
     public static final String LRC_URL_BAIDU_METHOD = "baidu.ting.song.lry";

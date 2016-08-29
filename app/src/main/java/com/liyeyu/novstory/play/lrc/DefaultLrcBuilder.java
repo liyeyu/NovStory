@@ -6,6 +6,8 @@ import android.util.Log;
 import com.liyeyu.novstory.Constants;
 import com.liyeyu.novstory.api.BaseApi;
 import com.liyeyu.novstory.entry.LrcBDRes;
+import com.liyeyu.novstory.entry.LrcKuGouRes;
+import com.liyeyu.novstory.entry.LrcKuGouSongRes;
 import com.liyeyu.novstory.entry.SongBDRes;
 import com.liyeyu.novstory.utils.CommUtils;
 import com.liyeyu.rxhttp.RetrofitHelper;
@@ -18,7 +20,9 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 
@@ -101,12 +105,10 @@ public class DefaultLrcBuilder implements ILrcBuilder {
             File file = new File(musicFileName.replace(endWith, ".lrc"));
             curLrcPath = file.getPath();
             if(!file.exists()){
-                return "";
-            }
-            file = new File(musicFileName.replace(endWith, ".txt"));
-            curLrcPath = file.getPath();
-            if(!file.exists()){
-                return "";
+                file = new File(musicFileName.replace(endWith, ".txt"));
+                if(!file.exists()){
+                    return "";
+                }
             }
 
             InputStreamReader inputReader = new InputStreamReader(new FileInputStream(file));
@@ -125,7 +127,104 @@ public class DefaultLrcBuilder implements ILrcBuilder {
         return "";
     }
 
-    public void getLrcFromUrl(final String songName, final String artist,final OnLrcLoadListener listener){
+    public void getLrcFromUrl(final String path,final String songName, final String artist,final OnLrcLoadListener listener){
+        RetrofitHelper.isDebug = false;
+        getSongFromKG(path,songName, artist, new OnLrcLoadListener() {
+            @Override
+            public void onSuccess() {
+                if(listener!=null){
+                    listener.onSuccess();
+                }
+            }
+
+            @Override
+            public void onError() {
+                getSongFromBD(path,songName,artist,listener);
+            }
+        });
+    }
+
+    public void getSongFromKG(final String path,final String songName, final String artist,final OnLrcLoadListener listener){
+        RetrofitHelper.setBaseUrl(Constants.LRC_URL_KUGOU);
+        RetrofitHelper.request(BaseApi.class, new RetrofitHelper.HttpCallBack<LrcKuGouSongRes, BaseApi>() {
+
+            @Override
+            public Call<LrcKuGouSongRes> request(BaseApi request) {
+                Map<String,String> map = new HashMap<>();
+                map.put("s",songName);
+                map.put("size","15");
+                map.put("page","1");
+                return request.getKGSong(Constants.APIKEY_BAIDU,map);
+            }
+
+            @Override
+            public void onCompleted(LrcKuGouSongRes res) {
+                LrcKuGouSongRes.DataBean data = res.getData();
+                if(data!=null && data.getData()!=null && !data.getData().isEmpty()){
+                    List<LrcKuGouSongRes.DataBean.LrcKGInner> list = data.getData();
+                    LrcKuGouSongRes.DataBean.LrcKGInner songBean = list.get(0);
+                    for (LrcKuGouSongRes.DataBean.LrcKGInner item:list) {
+                        if(artist.contains(item.getSingername())){
+                            songBean = item;
+                        }
+                    }
+                    songBean.setFilename(songName);
+                    getLrcFromKG(path,songBean,listener);
+                }else{
+                    if(listener!=null){
+                        listener.onError();
+                    }
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                if(listener!=null){
+                    listener.onError();
+                }
+            }
+        });
+    }
+
+
+    public void getLrcFromKG(final String path,final LrcKuGouSongRes.DataBean.LrcKGInner inner,final OnLrcLoadListener listener){
+        RetrofitHelper.request(BaseApi.class, new RetrofitHelper.HttpCallBack<LrcKuGouRes, BaseApi>() {
+
+            @Override
+            public Call<LrcKuGouRes> request(BaseApi request) {
+                Map<String,String> map = new HashMap<>();
+                map.put("name",inner.getFilename());
+                map.put("hash",inner.getHash());
+                map.put("time",inner.getDuration()+"");
+                return request.getKGLrc(Constants.APIKEY_BAIDU,map);
+            }
+
+            @Override
+            public void onCompleted(LrcKuGouRes res) {
+                if(res!=null && res.getData()!=null && !TextUtils.isEmpty(res.getData().getContent())){
+                    CommUtils.writeFile(path,res.getData().getContent());
+                    if(listener!=null){
+                        listener.onSuccess();
+                    }
+                }else{
+                    if(listener!=null){
+                        listener.onError();
+                    }
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                if(listener!=null){
+                    listener.onError();
+                }
+            }
+        });
+    }
+
+
+    public void getSongFromBD(final String path,final String songName, final String artist,final OnLrcLoadListener listener){
+        RetrofitHelper.setBaseUrl(Constants.LRC_URL_BAIDU);
         RetrofitHelper.request(BaseApi.class, new RetrofitHelper.HttpCallBack<SongBDRes, BaseApi>() {
             @Override
             public Call<SongBDRes> request(BaseApi request) {
@@ -140,7 +239,7 @@ public class DefaultLrcBuilder implements ILrcBuilder {
                     if(song!=null && !song.isEmpty()){
                         SongBDRes.SongBean songBean = song.get(0);
                         for (SongBDRes.SongBean item:song) {
-                            if(item.getArtistname().equals(artist)){
+                            if(artist.contains(item.getArtistname())){
                                 songBean = item;
                             }
                         }

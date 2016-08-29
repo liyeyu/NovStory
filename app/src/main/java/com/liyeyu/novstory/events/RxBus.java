@@ -42,7 +42,4 @@ public class RxBus {
     public void post(Object event) {
         mBusSubject.onNext(event);
     }
-    public void unRegister(Object event) {
-        mBusSubject.onNext(event);
-    }
 }
