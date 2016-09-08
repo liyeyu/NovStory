@@ -11,6 +11,7 @@ import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -56,7 +57,7 @@ public class PlayNotificationManager1 extends BroadcastReceiver {
         mService = service;
         mAppName = mService.getString(R.string.app_name);
         mNotificationColor = ResourceHelper.getThemeColor(mService, R.attr.colorPrimary,
-                service.getResources().getColor(R.color.gray_f5));
+                ContextCompat.getColor(service,R.color.gray_f5));
         mNotificationManager = NotificationManagerCompat.from(service);
         mController = mService.getMediaController();
         mTransportControls = mService.getTransportControls();

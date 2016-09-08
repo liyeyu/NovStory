@@ -7,7 +7,6 @@
             android:background="@drawable/item_play_ripple"
             android:paddingTop="@dimen/default_padding">
 
-
     <ImageView
         android:scaleType="center"
         android:id="@+id/iv_music_item_options"
@@ -26,17 +25,20 @@
         android:text="4:55"/>
 
     <TextView
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:ellipsize="marquee"
+        android:layout_alignParentLeft="true"
         android:transitionName="@string/start_anim_title"
         android:id="@+id/tv_music_item_title"
-        android:layout_alignParentLeft="true"
         style="@style/MusicItemTitleText"
         android:layout_toLeftOf="@+id/tv_music_item_time"
         android:text="@string/app_name"/>
 
     <TextView
+        android:layout_alignParentLeft="true"
         android:transitionName="@string/start_anim_singer"
         android:id="@+id/tv_music_item_singer"
-        android:layout_alignParentLeft="true"
         style="@style/MusicItemTitleSinger"
         android:layout_below="@+id/tv_music_item_title"
         android:layout_marginTop="@dimen/music_item_margin"

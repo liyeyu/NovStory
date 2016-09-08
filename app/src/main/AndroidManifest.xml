@@ -52,8 +52,6 @@
         </activity>
         <activity android:name=".act.AboutActivity">
         </activity>
-        <activity android:name=".act.TextActivity">
-        </activity>
     </application>
 
 </manifest>

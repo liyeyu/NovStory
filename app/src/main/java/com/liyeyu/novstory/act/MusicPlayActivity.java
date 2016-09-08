@@ -16,6 +16,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -40,6 +43,7 @@ import com.liyeyu.novstory.play.lrc.LrcView;
 import com.liyeyu.novstory.utils.DisplayUtils;
 import com.liyeyu.novstory.utils.ImageLoader;
 import com.liyeyu.novstory.utils.MediaUtils;
+import com.liyeyu.novstory.utils.ToastHelper;
 import com.liyeyu.novstory.view.AlbumPicView;
 import com.liyeyu.novstory.view.AppBarHeadView;
 import com.liyeyu.novstory.view.FlipperGestureListener;
@@ -78,6 +82,7 @@ public class MusicPlayActivity extends BaseActivity implements
     private LrcView mLrcView;
     private DefaultLrcBuilder mLrcBuilder;
     private View mLrcViewMask;
+    private String[] mPlayModes;
 
     @Override
     protected int OnCreateView() {
@@ -111,6 +116,7 @@ public class MusicPlayActivity extends BaseActivity implements
         super.onDestroy();
         mRxMusicChange.unsubscribe();
         mRxProgressUpdate.unsubscribe();
+        mAlbumPicView.recycle();
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -159,8 +165,6 @@ public class MusicPlayActivity extends BaseActivity implements
         updateAlbumMediaData();
         updatePlayView(new MusicChangeEvent(MusicChangeEvent.ERROR_POS
                 , new PlayStateChangeEvent(mMediaController.getPlaybackState().getState())));
-
-        updatePlayMode();
         mLove.setOnCheckStateChangeListener(new ShineButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(View view, boolean checked) {
@@ -174,6 +178,8 @@ public class MusicPlayActivity extends BaseActivity implements
         mLrcView.setHeightLightRowColor(ContextCompat.getColor(this,R.color.white));
         mLrcView.setNormalRowColor(ContextCompat.getColor(this,R.color.toolbar_color));
         mLrcBuilder = new DefaultLrcBuilder();
+        mPlayModes = getResources().getStringArray(R.array.play_mode);
+        updatePlayMode(false);
         beginLrcPlay();
     }
 
@@ -204,8 +210,10 @@ public class MusicPlayActivity extends BaseActivity implements
         }
     }
 
-    private void updatePlayMode() {
+    private void updatePlayMode(boolean show) {
         int mode = AppConfig.get(Constants.PLAY_MODE, MediaQueueManager.PLAY_MODE_ORDER);
+        if(show)
+            ToastHelper.showToast(this,mPlayModes[mode]);
         switch (mode) {
             case MediaQueueManager.PLAY_MODE_ORDER:
                 mMode.setImageResource(R.drawable.desk_order);
@@ -377,7 +385,7 @@ public class MusicPlayActivity extends BaseActivity implements
         switch (view.getId()) {
             case R.id.iv_play_mode:
                 NovPlayController.get().nextMode();
-                updatePlayMode();
+                updatePlayMode(true);
                 break;
             case R.id.iv_play_left:
                 if(mAlbumPicView.getVisibility()==View.VISIBLE){
@@ -399,21 +407,48 @@ public class MusicPlayActivity extends BaseActivity implements
             case R.id.lrc_all:
             case R.id.lrc_all_mask:
                 if(mAlbumPicView.getVisibility()==View.VISIBLE){
-                    mAlbumPicView.setVisibility(View.GONE);
-                    mLrcViewMask.setVisibility(View.GONE);
-                    mLrcView.setVisibility(View.VISIBLE);
+                    animLrc(1.0f,0f,mAlbumPicView);
+                    animLrc(1.0f,0f,mLrcViewMask);
+                    animLrc(0f,1.0f,mLrcView);
                     if(mLrcView.isHasLrc()){
                         mLrcView.setLoadingTipText(getString(R.string.lrc_loading));
                     }else{
                         mLrcView.setLoadingTipText(getString(R.string.lrc_not));
                     }
                 }else{
-                    mLrcView.setVisibility(View.GONE);
-                    mAlbumPicView.setVisibility(View.VISIBLE);
-                    mLrcViewMask.setVisibility(View.VISIBLE);
+                    animLrc(1.0f,0f,mLrcView);
+                    animLrc(0f,1.0f,mAlbumPicView);
+                    animLrc(0f,1.0f,mLrcViewMask);
                     mLrcView.setLoadingTipText("");
                 }
                 break;
         }
+    }
+
+    private void animLrc(final float from,final float to,final View view){
+        view.clearAnimation();
+        AlphaAnimation alpha = new AlphaAnimation(from,to);
+        alpha.setDuration(500);
+        alpha.setInterpolator(new LinearInterpolator());
+        alpha.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                if(to>from){
+                    view.setVisibility(View.VISIBLE);
+                }else{
+                    view.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        view.startAnimation(alpha);
     }
 }

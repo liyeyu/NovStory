@@ -43,10 +43,10 @@ public class FlipperGestureListener implements GestureDetector.OnGestureListener
             return false;
         }
 
-        if(e2.getX()-e1.getX()>100){
+        if(e2.getX()-e1.getX()>50){
             RxBus.get().post(new MusicFlingEvent(MusicFlingEvent.FLING_RIGHT));
             return true;
-        }else if(e2.getX()-e1.getX()<-100){
+        }else if(e2.getX()-e1.getX()<-50){
             RxBus.get().post(new MusicFlingEvent(MusicFlingEvent.FLING_LEFT));
             return true;
         }

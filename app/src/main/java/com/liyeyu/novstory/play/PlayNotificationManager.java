@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -55,7 +56,7 @@ public class PlayNotificationManager extends BroadcastReceiver implements Action
         RxBus.get().register(MusicChangeEvent.class,this);
         mService = service;
         mNotificationColor = ResourceHelper.getThemeColor(mService, R.attr.colorPrimary,
-                service.getResources().getColor(R.color.gray_f5));
+                ContextCompat.getColor(service,R.color.gray_f5));
         mNotificationManager = NotificationManagerCompat.from(service);
         mController = mService.getMediaController();
 
@@ -148,7 +149,6 @@ public class PlayNotificationManager extends BroadcastReceiver implements Action
         Notification mNotification = mBuilder.build();
         if(Build.VERSION.SDK_INT<Build.VERSION_CODES.LOLLIPOP){
             mBuilder.setContent(bigViews);
-            mNotification.contentView = bigViews;
         }else{
             mBuilder.setOngoing(mPlaybackState == PlaybackStateCompat.STATE_PLAYING);
         }

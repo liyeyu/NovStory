@@ -33,4 +33,12 @@
     <string name="about_author">by 喵了个咪</string>
     <string name="lrc_not">没有找到歌词,快去下载吧</string>
     <string name="lrc_loading">正在下载歌词...</string>
+
+
+    <string-array name="play_mode">
+        <item>循环播放</item>
+        <item>随机播放</item>
+        <item>单曲播放</item>
+        <item>单曲循环</item>
+    </string-array>
 </resources>

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -128,7 +129,7 @@ public class MusicListActivity extends BaseActivity{
 
 
     private void listAnim(final boolean isShowMask){
-        mAnimator = ValueAnimator.ofFloat(1, 0.3f);
+        mAnimator = ValueAnimator.ofFloat(1, 0.4f);
         mAnimator.setDuration(1000);
         mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -137,7 +138,7 @@ public class MusicListActivity extends BaseActivity{
                 if(isShowMask){
                     mRecyclerView.setAlpha(value);
                 }else{
-                    mRecyclerView.setAlpha(0.7f+value);
+                    mRecyclerView.setAlpha(0.6f+value);
                 }
             }
         });
@@ -184,7 +185,7 @@ public class MusicListActivity extends BaseActivity{
                 @Override
                 public Drawable getDrawable(String s) {
                     int drawableId = getResources().getIdentifier(s, "drawable", getPackageName());
-                    Drawable drawable = getResources().getDrawable(drawableId);
+                    Drawable drawable = ContextCompat.getDrawable(MusicListActivity.this,drawableId);
                     drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
                     return drawable;
                 }
@@ -192,7 +193,7 @@ public class MusicListActivity extends BaseActivity{
         }
 
         mToggle = new ActionBarDrawerToggle(this,mDrawerLayout,mHeadView.getToolbar(), R.string.open,R.string.close);
-        mDrawerLayout.setStatusBarBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        mDrawerLayout.setStatusBarBackgroundColor(ContextCompat.getColor(this,R.color.colorPrimary));
         mToggle.syncState();
         mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener(){
 
@@ -222,6 +223,7 @@ public class MusicListActivity extends BaseActivity{
     }
 
     private void onNavItemSelected(NavigationView mNav) {
+        mNav.setCheckedItem(R.id.nav_menu_home);
         mNav.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -358,8 +360,8 @@ public class MusicListActivity extends BaseActivity{
         ImageView mIcon = (ImageView) mSearchView.findViewById(R.id.search_button);
         mIcon.setImageResource(R.drawable.actionbar_search);
         mSearchEdit = (SearchView.SearchAutoComplete) mSearchView.findViewById(R.id.search_src_text);
-        mSearchEdit.setTextColor(getResources().getColor(R.color.white));
-        mSearchEdit.setHintTextColor(getResources().getColor(R.color.white_alpha_dd));
+        mSearchEdit.setTextColor(ContextCompat.getColor(this,R.color.white));
+        mSearchEdit.setHintTextColor(ContextCompat.getColor(this,R.color.white_alpha_dd));
         mSearchEdit.setTextSize(12);
         ImageView closeImg = (ImageView) mSearchView.findViewById(R.id.search_close_btn);
         closeImg.setImageResource(R.drawable.search_close);

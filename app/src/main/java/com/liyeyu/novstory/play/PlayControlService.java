@@ -49,10 +49,10 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
             PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID | PlaybackStateCompat.ACTION_PAUSE |
             PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
 
-    public MediaSessionCompat mMediaSession;
-    public MediaSessionCompat.Token token;
-    public MediaControllerCompat mediaController = null;
-    public MediaControllerCompat.TransportControls mTransportControls;
+    private MediaSessionCompat mMediaSession;
+    private MediaSessionCompat.Token token;
+    private MediaControllerCompat mediaController = null;
+    private MediaControllerCompat.TransportControls mTransportControls;
     private MediaControllerCallback mMediaControllerCallback;
     private AudioManager mAudioManager;
     private ComponentName mRemoteControlReceiverName;
@@ -60,8 +60,8 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
     private MediaPlayer mMediaPlayer;
     private MediaQueueManager mQueueManager;
     private PlaybackStateCompat.Builder mBob;
-    public PlayNotificationManager mNotificationManager;
-    MediaSessionCallback mCallback;
+    private PlayNotificationManager mNotificationManager;
+    private MediaSessionCallback mCallback;
     private MusicChangeEvent mChangeEvent;
     private Observable<Integer> mObservable;
     private Subscription mSubscribe;
