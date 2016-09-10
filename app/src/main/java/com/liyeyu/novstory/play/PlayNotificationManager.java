@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -33,23 +34,26 @@ public class PlayNotificationManager extends BroadcastReceiver implements Action
     public static final String ACTION_PLAY = Constants.PACKAGE_NAME +".play";
     public static final String ACTION_PREV = Constants.PACKAGE_NAME +".prev";
     public static final String ACTION_NEXT = Constants.PACKAGE_NAME +".next";
-    public static final String ACTION_STOP_CASTING = Constants.PACKAGE_NAME +".stop";
+    public static final String ACTION_STOP = Constants.PACKAGE_NAME +".stop";
+    public static final String ACTION_CLEAR = Constants.PACKAGE_NAME +".clear";
     public static final int NOTIFICATION_ID = 1129;
     private static final int REQUEST_CODE = 100;
     private final PendingIntent mPauseIntent;
     private final PendingIntent mPlayIntent;
     private final PendingIntent mPreviousIntent;
     private final PendingIntent mNextIntent;
-    private final PendingIntent mStopCastIntent;
+    private final PendingIntent mStopIntent;
     private final int mNotificationColor;
     private final NotificationManagerCompat mNotificationManager;
     private final PlayControlService mService;
     private final MediaControllerCompat mController;
     private final IntentFilter mIntentFilter;
+    private final PendingIntent mClearIntent;
     private MediaMetadataCompat mMetadata;
     private int mPlaybackState;
     private Notification mNotification;
     private NotificationCompat.Builder mBuilder;
+    private String mAction;
 
 
     public PlayNotificationManager(PlayControlService service){
@@ -69,8 +73,11 @@ public class PlayNotificationManager extends BroadcastReceiver implements Action
                 new Intent(ACTION_PREV).setPackage(pkg), PendingIntent.FLAG_CANCEL_CURRENT);
         mNextIntent = PendingIntent.getBroadcast(mService, REQUEST_CODE,
                 new Intent(ACTION_NEXT).setPackage(pkg), PendingIntent.FLAG_CANCEL_CURRENT);
-        mStopCastIntent = PendingIntent.getBroadcast(mService, REQUEST_CODE,
-                new Intent(ACTION_STOP_CASTING).setPackage(pkg),
+        mStopIntent = PendingIntent.getBroadcast(mService, REQUEST_CODE,
+                new Intent(ACTION_STOP).setPackage(pkg),
+                PendingIntent.FLAG_CANCEL_CURRENT);
+        mClearIntent = PendingIntent.getBroadcast(mService, REQUEST_CODE,
+                new Intent(ACTION_CLEAR).setPackage(pkg),
                 PendingIntent.FLAG_CANCEL_CURRENT);
 
         mIntentFilter = new IntentFilter();
@@ -78,11 +85,14 @@ public class PlayNotificationManager extends BroadcastReceiver implements Action
         mIntentFilter.addAction(ACTION_PAUSE);
         mIntentFilter.addAction(ACTION_PLAY);
         mIntentFilter.addAction(ACTION_PREV);
-        mIntentFilter.addAction(ACTION_STOP_CASTING);
+        mIntentFilter.addAction(ACTION_STOP);
+        mIntentFilter.addAction(ACTION_CLEAR);
+        mService.registerReceiver(this, mIntentFilter);
     }
 
     // 通知栏显示当前播放信息，利用通知和 PendingIntent来启动对应的activity
     private Notification createNotification() {
+
         Intent intent = new Intent(mService, MusicPlayActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         mBuilder = new NotificationCompat.Builder(
@@ -90,17 +100,17 @@ public class PlayNotificationManager extends BroadcastReceiver implements Action
         //兼容 6.0通知栏样式
         PendingIntent contentIntent = PendingIntent.getActivity(mService, 0,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.setContentIntent(contentIntent);
 
         String mTitle = mMetadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE);
         String mSinger = mMetadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST);
         long mSongId = Long.parseLong(mMetadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID));
         long mAlbumId = mMetadata.getLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER);
+        Bitmap mAlbumBitmap = ImageLoader.get().load(mSongId, mAlbumId);
         RemoteViews bigViews = new RemoteViews(mService.getPackageName(), R.layout.notification_play);
-        bigViews.setImageViewBitmap(R.id.iv_music_icon, ImageLoader.get().load(mSongId,mAlbumId));
+        bigViews.setImageViewBitmap(R.id.iv_music_icon, mAlbumBitmap);
         bigViews.setTextViewText(R.id.tv_notify_title,mTitle);
         bigViews.setTextViewText(R.id.tv_notify_singer, mSinger);
-        bigViews.setOnClickPendingIntent(R.id.iv_notify_close,mStopCastIntent);
+        bigViews.setOnClickPendingIntent(R.id.iv_notify_close, mClearIntent);
         bigViews.setOnClickPendingIntent(R.id.iv_notify_play_pre,mPreviousIntent);
         bigViews.setOnClickPendingIntent(R.id.tv_notify_play_next,mNextIntent);
         if(mPlaybackState==PlaybackStateCompat.STATE_PAUSED
@@ -111,27 +121,11 @@ public class PlayNotificationManager extends BroadcastReceiver implements Action
             bigViews.setOnClickPendingIntent(R.id.tv_notify_play,mPauseIntent);
             bigViews.setImageViewResource(R.id.tv_notify_play,R.drawable.mv_btn_pause_prs);
         }
-        mBuilder.setCustomBigContentView(bigViews);
-//        mBuilder.setTicker(mTitle);
-
-//        builder.setStyle(new android.support.v7.app.NotificationCompat.MediaStyle()
-//                        .setShowActionsInCompactView(
-//                                new int[]{playPauseButtonPosition})  // show only play/pause in compact view
-//                        .setMediaSession(NovPlayController.getController().getToken()))
-//                .setColor(mNotificationColor)
-//                .setSmallIcon(R.mipmap.ic_notification)
-//                .setVisibility(android.support.v7.app.NotificationCompat.VISIBILITY_PUBLIC)
-//                .setUsesChronometer(true)
-//                .setContentIntent(contentIntent)
-//                .setContentTitle(mAppName)
-//                .setContentText(mAppName)
-//                .setLargeIcon(bitmap);
-
         RemoteViews customViews = new RemoteViews(mService.getPackageName(), R.layout.notification_play_custom);
-        customViews.setImageViewBitmap(R.id.iv_music_icon,   ImageLoader.get().load(mSongId,mAlbumId));
+        customViews.setImageViewBitmap(R.id.iv_music_icon, mAlbumBitmap);
         customViews.setTextViewText(R.id.tv_notify_title,mTitle);
         customViews.setTextViewText(R.id.tv_notify_singer, mSinger);
-        customViews.setOnClickPendingIntent(R.id.iv_notify_close1,mStopCastIntent);
+        customViews.setOnClickPendingIntent(R.id.iv_notify_close1, mClearIntent);
         customViews.setOnClickPendingIntent(R.id.iv_notify_play_pre1,mPreviousIntent);
         customViews.setOnClickPendingIntent(R.id.tv_notify_play_next1,mNextIntent);
         if(mPlaybackState==PlaybackStateCompat.STATE_PAUSED
@@ -142,16 +136,19 @@ public class PlayNotificationManager extends BroadcastReceiver implements Action
             customViews.setOnClickPendingIntent(R.id.tv_notify_play1,mPauseIntent);
             customViews.setImageViewResource(R.id.tv_notify_play1,R.drawable.mv_btn_pause_prs);
         }
-        mBuilder.setCustomContentView(customViews);
+        mBuilder.setTicker(mTitle)
+                .setSmallIcon(R.mipmap.logo_notification)
+                .setContent(customViews)
+                .setCustomContentView(customViews)
+                .setCustomBigContentView(customViews)
+                .setContentIntent(contentIntent);
+
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
-            mBuilder.setSmallIcon(R.mipmap.logo_notification);
+            mBuilder.setCustomContentView(customViews)
+                    .setCustomBigContentView(bigViews);
         }
         Notification mNotification = mBuilder.build();
-        if(Build.VERSION.SDK_INT<Build.VERSION_CODES.LOLLIPOP){
-            mBuilder.setContent(bigViews);
-        }else{
-            mBuilder.setOngoing(mPlaybackState == PlaybackStateCompat.STATE_PLAYING);
-        }
+        mNotification.flags |= Notification.FLAG_NO_CLEAR;
 //        boolean isVoice = true, isVibrate = true;
 //        if (isVoice) {
 //            mNotification.defaults |= Notification.DEFAULT_SOUND;
@@ -173,16 +170,13 @@ public class PlayNotificationManager extends BroadcastReceiver implements Action
     public void startNotification() {
         mMetadata = mController.getMetadata();
         mPlaybackState = mService.getCurrentState();
-//        if(mPlaybackState==PlaybackStateCompat.STATE_STOPPED){
-//            mNotificationManager.cancel(NOTIFICATION_ID);
-//            return;
-//        }
-        if(mMetadata!=null){
+        if(mMetadata!=null && !ACTION_CLEAR.equals(mAction)){
             mNotification = createNotification();
-            if (mNotification != null) {
-                mService.registerReceiver(this, mIntentFilter);
-                mService.startForeground(NOTIFICATION_ID, mNotification);
-            }
+//            if (mNotification != null) {
+//                mService.startForeground(NOTIFICATION_ID, mNotification);
+//            }
+        }else{
+            mAction = "";
         }
     }
 
@@ -196,8 +190,8 @@ public class PlayNotificationManager extends BroadcastReceiver implements Action
 
     @Override
     public void onReceive(Context context, Intent intent) {
-         String action = intent.getAction();
-        switch (action) {
+        mAction = intent.getAction();
+        switch (mAction) {
             case ACTION_PAUSE:
                 mService.pause();
                 break;
@@ -210,11 +204,13 @@ public class PlayNotificationManager extends BroadcastReceiver implements Action
             case ACTION_PREV:
                 mService.skipToPrevious();
                 break;
-            case ACTION_STOP_CASTING:
+            case ACTION_STOP:
                 mService.stop();
-                if(mBuilder!=null){
-                    mBuilder.setAutoCancel(true);
-                    mBuilder.setOngoing(false);
+                break;
+            case ACTION_CLEAR:
+                mService.stop();
+                if(mNotification!=null){
+                    mNotification.flags = Notification.FLAG_AUTO_CANCEL;
                 }
                 mNotificationManager.cancel(NOTIFICATION_ID);
                 break;
