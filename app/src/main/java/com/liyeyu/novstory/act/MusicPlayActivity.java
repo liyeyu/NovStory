@@ -162,6 +162,9 @@ public class MusicPlayActivity extends BaseActivity implements
             }
         });
         mProgressView.updateMax(mMetadata, mMediaController.getPlaybackState());
+        if (mProgressView != null) {
+            mProgressView.setProgress(NovPlayController.get().getCurrentStreamPosition());
+        }
         updateAlbumMediaData();
         updatePlayView(new MusicChangeEvent(MusicChangeEvent.ERROR_POS
                 , new PlayStateChangeEvent(mMediaController.getPlaybackState().getState())));
