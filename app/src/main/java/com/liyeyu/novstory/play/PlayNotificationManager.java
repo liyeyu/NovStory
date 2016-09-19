@@ -121,6 +121,7 @@ public class PlayNotificationManager extends BroadcastReceiver implements Action
             bigViews.setOnClickPendingIntent(R.id.tv_notify_play,mPauseIntent);
             bigViews.setImageViewResource(R.id.tv_notify_play,R.drawable.mv_btn_pause_prs);
         }
+
         RemoteViews customViews = new RemoteViews(mService.getPackageName(), R.layout.notification_play_custom);
         customViews.setImageViewBitmap(R.id.iv_music_icon, mAlbumBitmap);
         customViews.setTextViewText(R.id.tv_notify_title,mTitle);
@@ -158,7 +159,6 @@ public class PlayNotificationManager extends BroadcastReceiver implements Action
 //        }
 //        mNotification.defaults|=Notification.DEFAULT_LIGHTS;
 //        mNotification.flags = Notification.FLAG_NO_CLEAR;// 永久在通知栏里?
-        // 使用自定义下拉视图时，不需要再调用setLatestEventInfo()方法，但是必须定义contentIntent
         mNotificationManager.notify(NOTIFICATION_ID, mNotification);
         return mNotification;
     }

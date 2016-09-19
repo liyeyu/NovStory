@@ -69,7 +69,7 @@ public class MusicRecycleAdapter extends RecyclerView.Adapter<MusicViewHolder> i
     }
 
     /**
-     * update music list by list change
+     * update by list change
      * @param holder
      * @param info
      */

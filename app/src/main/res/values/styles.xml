@@ -26,12 +26,10 @@
     </style>
     <style name="MusicItemTitleText" parent="MusicItem">
         <item name="android:textSize">14sp</item>
-        <item name="android:singleLine">true</item>
         <item name="android:textColor">@color/primary_text</item>
     </style>
     <style name="MusicItemTitleSinger" parent="MusicItem" >
         <item name="android:textSize">12sp</item>
-        <item name="android:singleLine">true</item>
         <item name="android:textColor">@color/secondary_text</item>
     </style>
 </resources>

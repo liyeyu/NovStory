@@ -36,7 +36,7 @@ public class NovPlayController extends BaseManager{
     /**
      * 初始化构造器
      */
-    public  void initControl(PlayControlService context) {
+    public void initControl(PlayControlService context) {
         mPlayServer = context;
     }
     /**

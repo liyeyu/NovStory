@@ -25,12 +25,12 @@
         </activity>
         <activity
             android:name=".act.MusicPlayActivity"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".act.MusicListActivity"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan"
             android:screenOrientation="portrait">
         </activity>

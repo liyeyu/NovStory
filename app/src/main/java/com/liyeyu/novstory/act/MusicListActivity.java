@@ -312,7 +312,6 @@ public class MusicListActivity extends BaseActivity{
         return true;
     }
 
-
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -363,6 +362,7 @@ public class MusicListActivity extends BaseActivity{
         mSearchEdit.setTextColor(ContextCompat.getColor(this,R.color.white));
         mSearchEdit.setHintTextColor(ContextCompat.getColor(this,R.color.white_alpha_dd));
         mSearchEdit.setTextSize(12);
+        mSearchEdit.clearFocus();
         ImageView closeImg = (ImageView) mSearchView.findViewById(R.id.search_close_btn);
         closeImg.setImageResource(R.drawable.search_close);
 

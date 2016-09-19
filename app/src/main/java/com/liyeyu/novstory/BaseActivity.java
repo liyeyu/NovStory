@@ -79,6 +79,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ServiceC
     protected abstract boolean isBindPlayService();
 
     protected abstract AppBarHeadView initHeadView(List<MenuInfo> mMenus);
+
     protected void removePlayBottom(){
         if(mMusicPlayView==null||mRoot==null){
             return;

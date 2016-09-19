@@ -17,7 +17,7 @@ public class ShareManager extends BaseManager {
         String mSinger = mMetadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST);
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(Intent.EXTRA_TEXT, "<"+mTitle+">-"+mSinger+"\n form "
+        intent.putExtra(Intent.EXTRA_TEXT, "< "+mTitle+" > - "+mSinger+"\n From "
                 +mApp.getPackageManager().getApplicationLabel(mApp.getApplicationInfo()));
         intent.setType("text/plain");
         mApp.startActivity(intent);
