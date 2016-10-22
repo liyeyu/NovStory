@@ -8,7 +8,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MenuItem;
@@ -20,9 +19,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.liyeyu.lrcview.lrc.LrcBuilder;
+import com.liyeyu.lrcview.lrc.LrcInfo;
+import com.liyeyu.lrcview.lrc.LrcView;
 import com.liyeyu.novstory.BaseActivity;
 import com.liyeyu.novstory.Constants;
 import com.liyeyu.novstory.R;
+import com.liyeyu.novstory.api.LrcHelper;
 import com.liyeyu.novstory.entry.Audio;
 import com.liyeyu.novstory.entry.MenuInfo;
 import com.liyeyu.novstory.events.MusicChangeEvent;
@@ -35,9 +38,6 @@ import com.liyeyu.novstory.manager.AppConfig;
 import com.liyeyu.novstory.manager.ShareManager;
 import com.liyeyu.novstory.play.MediaQueueManager;
 import com.liyeyu.novstory.play.NovPlayController;
-import com.liyeyu.novstory.play.lrc.DefaultLrcBuilder;
-import com.liyeyu.novstory.play.lrc.LrcRow;
-import com.liyeyu.novstory.play.lrc.LrcView;
 import com.liyeyu.novstory.utils.DisplayUtils;
 import com.liyeyu.novstory.utils.ImageLoader;
 import com.liyeyu.novstory.utils.MediaUtils;
@@ -48,6 +48,7 @@ import com.liyeyu.novstory.view.FlipperGestureListener;
 import com.liyeyu.novstory.view.MusicPlayProgressView;
 import com.sackcentury.shinebuttonlib.ShineButton;
 
+import java.io.InputStream;
 import java.util.List;
 
 import rx.Observable;
@@ -78,7 +79,6 @@ public class MusicPlayActivity extends BaseActivity implements
     private ImageView mMode;
     private long mMediaId;
     private LrcView mLrcView;
-    private DefaultLrcBuilder mLrcBuilder;
     private View mLrcViewMask;
     private String[] mPlayModes;
 
@@ -103,7 +103,7 @@ public class MusicPlayActivity extends BaseActivity implements
                     mProgressView.setProgress(progressUpdateEvent.getProgress());
                 }
                 if(mLrcView!=null){
-                    mLrcView.seekLrcToTime(progressUpdateEvent.getProgress());
+                    mLrcView.setCurrentTimeMillis(progressUpdateEvent.getProgress());
                 }
             }
         });
@@ -137,7 +137,6 @@ public class MusicPlayActivity extends BaseActivity implements
         mPre.setOnClickListener(this);
         mNext.setOnClickListener(this);
         mPlay.setOnClickListener(this);
-        mLrcView.setOnClickListener(this);
         mLrcViewMask.setOnClickListener(this);
         mAlbumPicView.setFlingListener(this);
         mProgressView = (MusicPlayProgressView) findViewById(R.id.mv_play_bottom_progress);
@@ -179,14 +178,23 @@ public class MusicPlayActivity extends BaseActivity implements
     }
 
     private void initLrcView(){
-        int size = getResources().getDimensionPixelSize(R.dimen.actionbar_title);
-        mLrcView.setLrcFontSize(size);
-        mLrcView.setIsCanDrag(false);
-        mLrcView.setHeightLightRowColor(ContextCompat.getColor(this,R.color.white));
-        mLrcView.setNormalRowColor(ContextCompat.getColor(this,R.color.toolbar_color));
-        mLrcBuilder = new DefaultLrcBuilder();
-    }
+        mLrcView.setOnPlayerClickListener(new LrcView.OnPlayerClickListener() {
+            @Override
+            public void onPlayerClicked(long progress, String content) {
+                NovPlayController.get().seekTo(progress);
+            }
+        });
+        mLrcView.setOnLrcViewTouchListener(new LrcView.OnLrcClickListener() {
+            @Override
+            public void onClick(View view, int line, String content) {
+                lrcViewAlphaAnim();
+            }
 
+            @Override
+            public void onLongClick(View view, int line, String content) {
+            }
+        });
+    }
     private void beginLrcPlay(){
         String path = "";
         if(mMetadata!=null){
@@ -194,24 +202,39 @@ public class MusicPlayActivity extends BaseActivity implements
         }else if(mAudio!=null){
             path = mAudio.getPath();
         }
-        String lrc = mLrcBuilder.getFromFile(path);
-        List<LrcRow> rows = mLrcBuilder.getLrcRows(lrc);
-        mLrcView.setLrc(rows);
-        if(TextUtils.isEmpty(lrc) || !mLrcView.isHasLrc()){
-            mLrcBuilder.getLrcFromUrl(mLrcBuilder.getCurLrcPath(),mTitle,mSinger,new DefaultLrcBuilder.OnLrcLoadListener(){
+        loadLrcInfo(path,false);
+    }
 
-                @Override
-                public void onSuccess() {
-                    mLrcView.setLrc(mLrcBuilder.getLrcRows(
-                            mLrcBuilder.getFromFile(mLrcBuilder.getCurLrcPath())));
-                }
+    private void loadLrcInfo(final String path,final boolean end){
+        LrcHelper.getFromFile(new LrcBuilder.OnLrcLoadListener() {
+            @Override
+            public InputStream loadLrc(LrcBuilder builder) {
+                return LrcHelper.getStream(path);
+            }
 
-                @Override
-                public void onError() {
-                    mLrcView.setLoadingTipText(getString(R.string.lrc_not));
+            @Override
+            public void onLoad(LrcBuilder builder, LrcInfo lrcInfo) {
+                if(lrcInfo==null){
+                    mLrcView.reset(getString(R.string.lrc_not));
+                    if(!end){
+                        LrcHelper.getLrcFromUrl(LrcHelper.getCurLrcPath(),mTitle,mSinger,new LrcHelper.OnLrcLoadListener(){
+
+                            @Override
+                            public void onSuccess() {
+                                loadLrcInfo(LrcHelper.getCurLrcPath(),true);
+                            }
+
+                            @Override
+                            public void onError() {
+                                mLrcView.reset(getString(R.string.lrc_not));
+                            }
+                        });
+                    }
+                }else{
+                    mLrcView.setLrcInfo(lrcInfo);
                 }
-            });
-        }
+            }
+        });
     }
 
     private void updatePlayMode(boolean show) {
@@ -397,25 +420,21 @@ public class MusicPlayActivity extends BaseActivity implements
                     NovPlayController.get().onSkipToNext();
                 }
                 break;
-            case R.id.lrc_all:
             case R.id.lrc_all_mask:
-                if(mAlbumPicView.getVisibility()==View.VISIBLE){
-                    AnimManager.animLrc(1.0f,0f,mAlbumPicView);
-                    AnimManager.animLrc(1.0f,0f,mLrcViewMask);
-                    AnimManager.animLrc(0f,1.0f,mLrcView);
-                    if(mLrcView.isHasLrc()){
-                        mLrcView.setLoadingTipText(getString(R.string.lrc_loading));
-                    }else{
-                        mLrcView.setLoadingTipText(getString(R.string.lrc_not));
-                    }
-                }else{
-                    AnimManager.animLrc(1.0f,0f,mLrcView);
-                    AnimManager.animLrc(0f,1.0f,mAlbumPicView);
-                    AnimManager.animLrc(0f,1.0f,mLrcViewMask);
-                    mLrcView.setLoadingTipText("");
-                }
+                lrcViewAlphaAnim();
                 break;
         }
     }
 
+    private void lrcViewAlphaAnim(){
+        if(mAlbumPicView.getVisibility()==View.VISIBLE){
+            AnimManager.animLrc(1.0f,0f,mAlbumPicView);
+            AnimManager.animLrc(1.0f,0f,mLrcViewMask);
+            AnimManager.animLrc(0f,1.0f,mLrcView);
+        }else{
+            AnimManager.animLrc(1.0f,0f,mLrcView);
+            AnimManager.animLrc(0f,1.0f,mAlbumPicView);
+            AnimManager.animLrc(0f,1.0f,mLrcViewMask);
+        }
+    }
 }

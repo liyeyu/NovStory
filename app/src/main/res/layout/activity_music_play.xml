@@ -38,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.liyeyu.novstory.play.lrc.LrcView
+            <com.liyeyu.lrcview.lrc.LrcView
                 android:visibility="gone"
                 android:id="@+id/lrc_all"
                 android:layout_width="match_parent"

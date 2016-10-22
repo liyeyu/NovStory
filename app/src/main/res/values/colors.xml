@@ -14,6 +14,7 @@
     <color name="white">#ffffff</color>
     <color name="white_alpha_dd">#aac4c4c4</color>
     <color name="black">#000000</color>
+    <color name="half_transparent_gray">#11b3b3b3</color>
     <color name="half_transparent">#a0000000</color>
     <color name="half_transparent1">#33000000</color>
     <color name="transparent">#00000000</color>

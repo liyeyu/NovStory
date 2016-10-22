@@ -68,7 +68,9 @@ public class MediaUtils {
                 MediaStore.Audio.Media.DURATION + "> ? ",
                 new String[]{AppConfig.get(Constants.SETTING_DURATION, String.valueOf(30 * 1000))},
                 order);
-
+        if(cursor==null){
+            return audioList;
+        }
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             Bundle bundle = new Bundle();
             for (int i = 0; i < AUDIO_KEYS.length; i++) {
