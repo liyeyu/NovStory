@@ -26,6 +26,7 @@ public class MusicPlayProgressView extends FrameLayout implements SeekBar.OnSeek
     private MediaMetadataCompat mMediaMetadata;
     private int mDuration;
     private long currentMediaId;
+    private boolean isTouch;
 
     public MusicPlayProgressView(Context context) {
         super(context);
@@ -71,23 +72,26 @@ public class MusicPlayProgressView extends FrameLayout implements SeekBar.OnSeek
         if(progress<=0 || progress>=mSeekBar.getMax()){
             progress = 0;
         }
-        mStart.setText(DateUtils.formatElapsedTime(progress/1000));
-        mSeekBar.setProgress(progress);
+        if(!isTouch){
+            mStart.setText(DateUtils.formatElapsedTime(progress/1000));
+            mSeekBar.setProgress(progress);
+        }
     }
 
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
+        mStart.setText(DateUtils.formatElapsedTime(seekBar.getProgress()/1000));
     }
 
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
-
+        isTouch = true;
     }
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
+        isTouch = false;
         NovPlayController.get().seekTo(seekBar.getProgress());
         mStart.setText(DateUtils.formatElapsedTime(seekBar.getProgress()/1000));
     }

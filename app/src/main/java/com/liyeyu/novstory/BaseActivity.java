@@ -39,7 +39,7 @@ public abstract class BaseActivity extends AppCompatActivity implements ServiceC
     private View mLoading;
     protected NovStoryApp mApp;
     protected MediaControllerCompat mMediaController;
-    public PlayControlService.IPlayBinder mPlayService;
+    protected PlayControlService.IPlayBinder mPlayService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -127,7 +127,7 @@ public class MusicPlayView extends FrameLayout implements View.OnClickListener{
                 NovPlayController.get().play();
                 break;
             case R.id.tv_music_play_next:
-                NovPlayController.get().onSkipToNext();
+                NovPlayController.get().skipToNext();
                 break;
             case R.id.iv_music_play_options:
                 break;

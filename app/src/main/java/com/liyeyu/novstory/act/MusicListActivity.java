@@ -240,7 +240,7 @@ public class MusicListActivity extends BaseActivity{
                         IntentUtils.startAboutActivity(MusicListActivity.this);
                         break;
                     case R.id.nav_menu_setting:
-//                        IntentUtils.startSettingActivity(MusicListActivity.this);
+                        IntentUtils.startSettingActivity(MusicListActivity.this);
                         break;
                 }
                 // Menu item点击后选中，并关闭DrawerLayout

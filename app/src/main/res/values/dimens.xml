@@ -26,4 +26,5 @@
     <dimen name="play_margin_size">80dp</dimen>
     <dimen name="about_text">16sp</dimen>
     <dimen name="sp10">10sp</dimen>
+    <dimen name="size_15">15dp</dimen>
 </resources>

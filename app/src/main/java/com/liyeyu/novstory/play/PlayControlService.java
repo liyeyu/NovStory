@@ -25,6 +25,7 @@ import com.liyeyu.novstory.events.PlayStateChangeEvent;
 import com.liyeyu.novstory.events.ProgressUpdateEvent;
 import com.liyeyu.novstory.events.RxBus;
 import com.liyeyu.novstory.manager.AppConfig;
+import com.liyeyu.novstory.manager.NovWindowManager;
 import com.liyeyu.novstory.play.callback.MediaControllerCallback;
 
 import java.io.IOException;
@@ -35,12 +36,10 @@ import java.util.concurrent.TimeUnit;
 
 import liyeyu.support.utils.utils.LogUtil;
 import rx.Observable;
-import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 public class PlayControlService extends Service implements IPlayServer, MediaPlayer.OnCompletionListener {
     public static final float VOLUME_DUCK = 0.2f;
@@ -70,6 +69,7 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
     private int mProgress;
     private Random random = new Random();
     private List<Integer> randomList = new ArrayList<>();
+    private NovWindowManager mNovWindowManager;
 
     @Override
     public void onCreate() {
@@ -81,15 +81,21 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
         NovPlayController.get().initControl(this);
         initMediaPlayer();
         initProgressHandler();
+        initWindow();
         mNotificationManager = new PlayNotificationManager(this);
         mChangeEvent = new MusicChangeEvent(MusicChangeEvent.ERROR_POS,new PlayStateChangeEvent());
+    }
+
+    private void initWindow() {
+        mNovWindowManager = NovWindowManager.get(this);
+        mNovWindowManager.updateWindow(AppConfig.get("isCheck",true));
     }
 
 
     protected void initProgressHandler(){
         mProgressUpdateEvent = new ProgressUpdateEvent();
         mObservable = Observable.just(0)
-                .interval(1, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .interval(200, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
                 .map(new Func1<Long, Integer>() {
                     @Override
                     public Integer call(Long aLong) {
@@ -101,10 +107,12 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
 
     private synchronized void updateProgressHandler(){
         if(mediaController!=null){
-                mSubscribe = mObservable.subscribe(new Action1<Integer>() {
+                mSubscribe = mObservable
+                        .subscribe(new Action1<Integer>() {
                     @Override
                     public void call(Integer integer) {
                         RxBus.get().post(mProgressUpdateEvent.progress(getProgress()));
+                        mNovWindowManager.refresh();
                     }
                 });
         }
@@ -190,6 +198,7 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
         if(!TextUtils.isEmpty(mediaId) && NovPlayController.get().getSession()!=null){
             MediaMetadataCompat metaData = mQueueManager.getMetaData(Long.valueOf(mediaId));
             if(metaData!=null){
+                mNovWindowManager.attachMediaMetadata(metaData);
                 mProgress = AppConfig.get(Constants.LAST_PROGRESS, 0);
                 mMediaSession.setMetadata(metaData);
                 mediaController.getTransportControls().playFromMediaId(mediaId,null);
@@ -219,6 +228,7 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
         mAudioManager.unregisterMediaButtonEventReceiver(mRemoteControlReceiverName);
         mMediaPlayer.release();
         mMediaPlayer = null;
+        mNovWindowManager.release();
     }
 
     public int getCurrentStreamPosition() {
@@ -296,6 +306,7 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
     public void onDestroy() {
         super.onDestroy();
         AppConfig.save(Constants.LAST_PROGRESS,getProgress());
+        stop();
         release();
         mNotificationManager.release();
         cancelTimer();
@@ -311,13 +322,6 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
         super.unbindService(conn);
     }
 
-//    public IPlayAidlInterface.Stub mStub = new IPlayAidlInterface.Stub() {
-//        @Override
-//        public void showNotification() throws RemoteException {
-//            mNotificationManager.startNotification();
-//        }
-//    };
-
     public class IPlayBinder extends Binder {
         public IPlayBinder() {
         }
@@ -326,8 +330,11 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
             return token;
         }
 
-    }
+        public void updateWindow(boolean isCheck){
+            mNovWindowManager.updateWindow(isCheck);
+        }
 
+    }
 
     @Override
     public void play() {
@@ -356,8 +363,6 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
         MediaMetadataCompat curMetadata = mediaController.getMetadata();
         if(audio==null && curMetadata==null){
             return;
-
-
         }
         long id ;
         if(curMetadata!=null && audio!=null){
@@ -369,7 +374,11 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
         if(audio!=null){
             curMetadata = MediaQueueManager.CreateMetaData(audio);
         }
-        play(curMetadata);
+        if(curMetadata!=null){
+            publishState(PlaybackState.STATE_PLAYING);
+            mTransportControls.play();
+            play(curMetadata);
+        }
     }
 
     @Override
@@ -377,46 +386,33 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
         if(curMetadata==null){
             return;
         }
-        Observable.create(new Observable.OnSubscribe<Object>() {
-            @Override
-            public void call(Subscriber<? super Object> subscriber) {
-                long id = Long.parseLong(curMetadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID));
-                requestAudioFocus();
-                mQueueManager.updateCurrentPos(id);
-                mMediaSession.setMetadata(curMetadata);
-                mMediaPlayer.setOnCompletionListener(PlayControlService.this);
-                mTransportControls.playFromMediaId(String.valueOf(id),null);
-                publishState(PlaybackStateCompat.STATE_PLAYING);
-                LogUtil.i("play:" + curMetadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE)+" mCurrentIndex:"+mQueueManager.mCurrentIndex);
-                try {
-                    mMediaPlayer.reset();
-                    mMediaPlayer.setLooping(false);
-                    mMediaPlayer.setDataSource(curMetadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI));
-                    mMediaPlayer.prepareAsync();
-                    mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                        @Override
-                        public void onPrepared(MediaPlayer mediaPlayer) {
-                            mMediaPlayer.start();
-                            if(isPlayConfig && mProgress!=0){
-                                seekTo(mProgress);
-                                mProgress = 0;
-                            }
-                        }
-                    });
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                subscriber.onNext(null);
-                subscriber.onCompleted();
-            }
-        }).subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Object>() {
-                    @Override
-                    public void call(Object o) {
-                        mNotificationManager.startNotification();
+        mNovWindowManager.attachMediaMetadata(curMetadata);
+        long id = Long.parseLong(curMetadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID));
+        requestAudioFocus();
+        mQueueManager.updateCurrentPos(id);
+        mMediaSession.setMetadata(curMetadata);
+        mMediaPlayer.setOnCompletionListener(PlayControlService.this);
+        mTransportControls.playFromMediaId(String.valueOf(id),null);
+        LogUtil.i("play:" + curMetadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE)+" mCurrentIndex:"+mQueueManager.mCurrentIndex);
+        try {
+            mMediaPlayer.reset();
+            mMediaPlayer.setLooping(false);
+            mMediaPlayer.setDataSource(curMetadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI));
+            mMediaPlayer.prepareAsync();
+            mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    mMediaPlayer.start();
+                    mNotificationManager.startNotification();
+                    if(isPlayConfig && mProgress!=0){
+                        seekTo(mProgress);
+                        mProgress = 0;
                     }
-                });
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -439,10 +435,17 @@ public class PlayControlService extends Service implements IPlayServer, MediaPla
 
     @Override
     public void seekTo(long pos) {
-        publishState(PlaybackStateCompat.STATE_PLAYING);
-        mTransportControls.seekTo(pos);
+        seekTo(pos,true);
+    }
+
+    public void seekTo(long pos,boolean play) {
         if(mMediaPlayer!=null){
+            if(!mMediaPlayer.isPlaying() && play){
+                play();
+            }
+            mTransportControls.seekTo(pos);
             mMediaPlayer.seekTo((int) pos);
+            publishState(PlaybackStateCompat.STATE_PLAYING);
         }
     }
 

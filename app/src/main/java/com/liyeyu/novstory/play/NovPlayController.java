@@ -65,10 +65,10 @@ public class NovPlayController extends BaseManager{
     public void seekTo(long pos){
         mPlayServer.seekTo(pos);
     }
-    public void onSkipToNext(){
+    public void skipToNext(){
         mPlayServer.skipToNext();
     }
-    public void onSkipToPrevious(){
+    public void skipToPrevious(){
         mPlayServer.skipToPrevious();
     }
 
@@ -101,6 +101,7 @@ public class NovPlayController extends BaseManager{
     public void updateQueue(int fromPosition, int toPosition) {
         mPlayServer.updateQueue(fromPosition,toPosition);
     }
+
     public void remove(int position) {
         mPlayServer.remove(position);
     }

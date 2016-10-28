@@ -112,6 +112,7 @@ public class MusicPlayActivity extends BaseActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        AppConfig.save(Constants.LAST_PROGRESS,NovPlayController.get().getCurrentStreamPosition());
         mRxMusicChange.unsubscribe();
         mRxProgressUpdate.unsubscribe();
         mAlbumPicView.recycle();
@@ -295,7 +296,7 @@ public class MusicPlayActivity extends BaseActivity implements
             int prePos = NovPlayController.get().getSkipQueuePosition(-1);
             updateMediaData(prePos, null, mAlbumPicView.getPreIndex());
         } else if (state == AlbumPicView.ANIM_END) {
-            NovPlayController.get().onSkipToPrevious();
+            NovPlayController.get().skipToPrevious();
         }
     }
 
@@ -305,7 +306,7 @@ public class MusicPlayActivity extends BaseActivity implements
             final int nextPos = NovPlayController.get().getSkipQueuePosition(1);
             updateMediaData(nextPos, null, mAlbumPicView.getNextIndex());
         } else if (state == AlbumPicView.ANIM_END) {
-            NovPlayController.get().onSkipToNext();
+            NovPlayController.get().skipToNext();
         }
     }
 
@@ -407,7 +408,7 @@ public class MusicPlayActivity extends BaseActivity implements
                 if(mAlbumPicView.getVisibility()==View.VISIBLE){
                     RxBus.get().post(new MusicFlingEvent(MusicFlingEvent.FLING_RIGHT));
                 }else{
-                    NovPlayController.get().onSkipToPrevious();
+                    NovPlayController.get().skipToPrevious();
                 }
                 break;
             case R.id.iv_play_play:
@@ -417,7 +418,7 @@ public class MusicPlayActivity extends BaseActivity implements
                 if(mAlbumPicView.getVisibility()==View.VISIBLE){
                     RxBus.get().post(new MusicFlingEvent(MusicFlingEvent.FLING_LEFT));
                 }else{
-                    NovPlayController.get().onSkipToNext();
+                    NovPlayController.get().skipToNext();
                 }
                 break;
             case R.id.lrc_all_mask:
