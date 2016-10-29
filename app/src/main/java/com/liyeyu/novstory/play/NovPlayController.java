@@ -123,11 +123,12 @@ public class NovPlayController extends BaseManager{
             s += "#"+id;
         }else{
             if(!TextUtils.isEmpty(s)){
-                List<String> list = Arrays.asList(s.split("#"));
+                List<String> list = Arrays.asList(s.trim().split("#"));
                 if(list.contains(String.valueOf(id))){
+                    list.remove(id);
                     s = "";
                     for (String item:list) {
-                        if(!item.equals(String.valueOf(id))){
+                        if(!TextUtils.isEmpty(item) && !item.equals(String.valueOf(id))){
                             s += "#"+item;
                         }
                     }

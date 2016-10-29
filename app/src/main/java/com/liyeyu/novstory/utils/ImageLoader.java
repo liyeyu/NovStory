@@ -89,7 +89,6 @@ public class ImageLoader {
                 .resize(100,100)
                 .centerCrop()
                 .transform(transformation)
-                .noFade()
                 .tag(new BlurTarget(view,res))
 //                .memoryPolicy(NO_CACHE, NO_STORE)
                 .into(view);
@@ -99,7 +98,6 @@ public class ImageLoader {
                 .resize(50, 50)
                 .centerCrop()
                 .transform(transformation)
-                .noFade()
                 .into(view);
 
     }

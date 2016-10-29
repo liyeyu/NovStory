@@ -35,6 +35,7 @@ public class MediaQueueManager extends BaseManager{
             PLAY_MODE_SINGLE_LOOP};
     public static final String ALL = "all";
     public static final String LOVE = "love";
+    public static String CURRENT_TAG = ALL;
     public int mCurrentIndex = 0;
     private static MediaQueueManager queueManager;
     public static List<MediaSessionCompat.QueueItem> LoveQueueItems = new ArrayList<>();
@@ -42,7 +43,7 @@ public class MediaQueueManager extends BaseManager{
     private volatile static List<MediaSessionCompat.QueueItem> CurrentPlayQueueItems = new ArrayList<>();
     public static Map<String,List<MediaSessionCompat.QueueItem>> QueueTitles = new HashMap<>();
     public static Map<Long,MediaMetadataCompat> metaDataIds = new HashMap<>();
-    public List<Audio> mAudioList;
+    public List<Audio> mAudioList = new ArrayList<>();
     public List<Audio> mLoveList = new ArrayList<>();
     public static List<String> mLoveSongs;
 
@@ -81,7 +82,12 @@ public class MediaQueueManager extends BaseManager{
      * 查询媒体信息
      */
     public synchronized List<Audio> queryMediaList(Context context,String tag){
-        mAudioList = MediaUtils.getAudioList(context);
+        CURRENT_TAG = tag;
+        List<Audio> allAudioList = MediaUtils.getAllAudioList(context);
+        if(allAudioList!=null){
+            mAudioList.clear();
+            mAudioList.addAll(allAudioList);
+        }
         if(LOVE.equals(tag)){
             LoveQueueItems.clear();
             mLoveList.clear();

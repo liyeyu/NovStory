@@ -284,7 +284,7 @@ public class MusicPlayActivity extends BaseActivity implements
         }
     }
 
-    private void updateAlbumPlayView(long songId, long albumId, int pos) {
+    private void updateAlbumPlayView(final long songId,final long albumId, int pos) {
         mAlbumPicView.setImage(pos,songId,albumId);
         ImageLoader.get().blur(mBackground, MediaUtils.getArtworkUri(this, songId, albumId));
     }

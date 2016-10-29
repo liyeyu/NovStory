@@ -53,21 +53,31 @@ public class MediaUtils {
             MediaStore.Audio.Media.DATA
     };
 
-
-    public static List<Audio> getAudioList(Context context) {
-        return getAudioList(context, null);
-    }
-
-    public static List<Audio> getAudioList(Context context, String order) {
-        List<Audio> audioList = new ArrayList<>();
-
+    public static List<Audio> getAllAudioList(Context context) {
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 AUDIO_KEYS,
                 MediaStore.Audio.Media.DURATION + "> ? ",
                 new String[]{AppConfig.get(Constants.SETTING_DURATION, String.valueOf(30 * 1000))},
-                order);
+                null);
+        return getAudioList(cursor);
+    }
+
+    public static List<Audio> getAudioListLimit (Context context,int limit,int page) {
+        ContentResolver resolver = context.getContentResolver();
+        Cursor cursor = resolver.query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                AUDIO_KEYS,
+                MediaStore.Audio.Media.DURATION + "> ? ",
+                new String[]{AppConfig.get(Constants.SETTING_DURATION, String.valueOf(30 * 1000))},
+                MediaStore.Audio.Media._ID +" limit "+ limit + " offset " + page);
+
+        return getAudioList(cursor);
+    }
+
+    private static List<Audio> getAudioList(Cursor cursor) {
+        List<Audio> audioList = new ArrayList<>();
         if(cursor==null){
             return audioList;
         }

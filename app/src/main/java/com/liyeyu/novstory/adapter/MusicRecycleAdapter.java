@@ -9,6 +9,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
 import com.jakewharton.rxbinding.view.RxView;
+import com.liyeyu.novstory.Constants;
 import com.liyeyu.novstory.R;
 import com.liyeyu.novstory.adapter.callback.OnMusicItemClick;
 import com.liyeyu.novstory.adapter.callback.onMoveAndSwipedListener;
@@ -21,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import liyeyu.support.utils.utils.LogUtil;
 import rx.functions.Action1;
 
 /**
@@ -77,6 +79,7 @@ public class MusicRecycleAdapter extends RecyclerView.Adapter<MusicViewHolder> i
         holder.mTitle.setText(info.getTitle());
         holder.mSinger.setText(info.getArtist());
         holder.mTime.setText(TimeUtils.computer(info.getDuration(), TimeUnit.MILLISECONDS));
+        LogUtil.i(info.getId()+" "+info.getTitle());
     }
 
     @Override
@@ -139,6 +142,11 @@ public class MusicRecycleAdapter extends RecyclerView.Adapter<MusicViewHolder> i
             notifyDataSetChanged();
         }
     }
+
+    public int getCurrentPage(){
+        return getItemCount() / Constants.LIST_ITEM_NUM;
+    }
+
 
     public List<Audio> getData(){
         return mMedias;
